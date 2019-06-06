@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubewatch-config
+  namespace: default
+data:
+  config.yaml: |-
+    log:
+      level: debug
+    watch: 
+      namespace: "default"
+      interval: 60s

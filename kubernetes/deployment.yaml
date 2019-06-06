@@ -11,7 +11,14 @@ spec:
         app: kubewatch
     spec:
       serviceAccountName: default
+      volumes:
+        - name: config-volume
+          configMap:
+            name: kubewatch-config
       containers:
       - name: kubewatch
         image: quay.io/leogr/kubewatch:dev
         imagePullPolicy: Always
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/kubewatch

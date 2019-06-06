@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/vchain-us/kubewatch/pkg/config"
 	"github.com/vchain-us/kubewatch/pkg/verify"
 
 	log "github.com/sirupsen/logrus"
@@ -22,21 +23,16 @@ import (
 )
 
 type Interface interface {
-	Run() error
+	Run()
 }
 
 type watchdog struct {
 	clientset *kubernetes.Clientset
 	log       *log.Logger
-	cfg       *Config
+	cfg       config.Interface
 }
 
-type Config struct {
-	Namespace string
-	Interval  time.Duration
-}
-
-func New(clientset *kubernetes.Clientset, config Config, logger *log.Logger) (Interface, error) {
+func New(clientset *kubernetes.Clientset, cfg config.Interface, logger *log.Logger) (Interface, error) {
 
 	if clientset == nil {
 		return nil, fmt.Errorf("clientset cannot be nil")
@@ -49,31 +45,46 @@ func New(clientset *kubernetes.Clientset, config Config, logger *log.Logger) (In
 	return &watchdog{
 		clientset: clientset,
 		log:       logger,
-		cfg:       &config,
+		cfg:       cfg,
 	}, nil
 }
 
-func (w *watchdog) Run() error {
+func (w *watchdog) Run() {
 	clientset := w.clientset
 	for {
-		pods, err := clientset.CoreV1().Pods(w.cfg.Namespace).List(metav1.ListOptions{})
+		w.log.SetLevel(w.cfg.LogLevel())
+
+		ns := w.cfg.Namespace()
+		sleep := w.cfg.Interval()
+		keys := w.cfg.TrustedKeys()
+		fields := log.Fields{
+			"namespace":   ns,
+			"interval":    sleep,
+			"trustedKeys": keys,
+		}
+
+		pods, err := clientset.CoreV1().Pods(ns).List(metav1.ListOptions{})
 		if err != nil {
-			return err
-		}
-		w.log.Infof("There are %d pods in the cluster", len(pods.Items))
+			fields["error"] = true
+			w.log.WithFields(fields).Errorf("Error getting pods: %s", err)
+		} else {
+			fields["podCount"] = len(pods.Items)
+			w.log.WithFields(fields).Debug("Verification started")
 
-		for _, pod := range pods.Items {
-			w.watchPod(pod)
+			for _, pod := range pods.Items {
+				w.watchPod(pod, keys...)
+			}
 		}
 
-		time.Sleep(w.cfg.Interval)
+		w.log.Debugf("Sleeping for %s", sleep)
+		time.Sleep(sleep)
 	}
 }
 
-func (w *watchdog) watchPod(pod corev1.Pod) {
+func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 	for _, status := range pod.Status.ContainerStatuses {
 
-		verification, err := verify.ImageID(status.ImageID)
+		verification, err := verify.ImageID(status.ImageID, trustedKeys...)
 		if err != nil {
 			w.log.Errorf("Cannot verify %s in pod %s: %s", status.ImageID, pod.Name, err)
 			continue

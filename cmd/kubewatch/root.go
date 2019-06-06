@@ -9,10 +9,9 @@
 package main
 
 import (
-	"time"
-
 	"github.com/sirupsen/logrus"
 
+	"github.com/vchain-us/kubewatch/pkg/config"
 	"github.com/vchain-us/kubewatch/pkg/watcher"
 
 	"k8s.io/client-go/kubernetes"
@@ -30,24 +29,24 @@ import (
 
 func main() {
 	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
+	clusterCfg, err := rest.InClusterConfig()
 	if err != nil {
 		panic(err.Error())
 	}
 	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(config)
+	clientset, err := kubernetes.NewForConfig(clusterCfg)
 	if err != nil {
 		panic(err.Error())
 	}
 	// creates the logger
 	logger := logrus.New()
 	// creates the watcher configuration
-	wConfig := watcher.Config{
-		Namespace: "",
-		Interval:  time.Second * 10,
+	cfg, err := config.New()
+	if err != nil {
+		panic(err.Error())
 	}
 	// creates and run the watcher
-	w, err := watcher.New(clientset, wConfig, logger)
+	w, err := watcher.New(clientset, cfg, logger)
 	if err != nil {
 		panic(err.Error())
 	}

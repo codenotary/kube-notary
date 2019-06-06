@@ -3,10 +3,11 @@ module github.com/vchain-us/kubewatch
 go 1.12
 
 require (
+	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
-	github.com/google/go-containerregistry v0.0.0-20190531175139-2687bd5ba651
 	github.com/sirupsen/logrus v1.4.1
+	github.com/spf13/viper v1.3.3-0.20190404120201-fccfc2c271a5
 	github.com/vchain-us/vcn v0.0.0-20190605072930-cc707efd27a7
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45 // indirect
