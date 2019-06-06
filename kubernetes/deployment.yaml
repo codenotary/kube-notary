@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kubewatch-deployment
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kubewatch
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: kubewatch
+        image: quay.io/leogr/kubewatch:dev
+        imagePullPolicy: Always
