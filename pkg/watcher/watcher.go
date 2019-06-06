@@ -84,9 +84,14 @@ func (w *watchdog) Run() {
 func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 	for _, status := range pod.Status.ContainerStatuses {
 
+		if status.State.Running == nil {
+			w.log.Infof(`Container "%s" in pod "%s" is not running: skipped`, status.Name, pod.Name)
+			continue
+		}
+
 		verification, err := verify.ImageID(status.ImageID, trustedKeys...)
 		if err != nil {
-			w.log.Errorf("Cannot verify %s in pod %s: %s", status.ImageID, pod.Name, err)
+			w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
 			continue
 		}
 
@@ -94,6 +99,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 
 		fields := log.Fields{
 			"pod":          pod.Name,
+			"container":    status.Name,
 			"image":        status.Image,
 			"imageID":      status.ImageID,
 			"verification": string(b),
@@ -102,9 +108,9 @@ func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 		}
 
 		if verification.Trusted() {
-			w.log.WithFields(fields).Infof("Image %s (digest: %s) is trusted", status.Image, status.ImageID)
+			w.log.WithFields(fields).Infof(`Image "%s" (ImageID: %s) is trusted`, status.Image, status.ImageID)
 		} else {
-			w.log.WithFields(fields).Warnf("Image %s (digest: %s) is NOT trusted", status.Image, status.ImageID)
+			w.log.WithFields(fields).Warnf(`Image "%s" (ImageID: %s) is NOT trusted`, status.Image, status.ImageID)
 		}
 	}
 }
