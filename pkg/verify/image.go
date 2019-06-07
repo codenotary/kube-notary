@@ -11,12 +11,18 @@ package verify
 import (
 	"strings"
 
+	"github.com/vchain-us/kubewatch/pkg/image"
+
 	"github.com/vchain-us/vcn/pkg/api"
 )
 
-// ImageID returns the BlockchainVerification for imageId
-func ImageID(imageID string, signerKeys ...string) (verification *api.BlockchainVerification, err error) {
-	hash := strings.TrimPrefix(imageID, "sha256:")
+// ImageID returns the hast string and the BlockchainVerification for the given imageID
+func ImageID(imageID string, signerKeys ...string) (hash string, verification *api.BlockchainVerification, err error) {
+	digest, err := image.Digest(imageID)
+	if err != nil {
+		return
+	}
+	hash = strings.TrimPrefix(digest, "sha256:")
 	if len(signerKeys) > 0 {
 		verification, err = api.BlockChainVerifyMatchingPublicKeys(hash, signerKeys)
 	} else {

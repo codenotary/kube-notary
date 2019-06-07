@@ -6,6 +6,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
+	github.com/google/go-containerregistry v0.0.0-20190531175139-2687bd5ba651
 	github.com/sirupsen/logrus v1.4.1
 	github.com/spf13/viper v1.3.3-0.20190404120201-fccfc2c271a5
 	github.com/vchain-us/vcn v0.0.0-20190605072930-cc707efd27a7
@@ -15,5 +16,6 @@ require (
 	k8s.io/api v0.0.0-20190602205700-9b8cae951d65
 	k8s.io/apimachinery v0.0.0-20190602183612-63a6072eb563
 	k8s.io/client-go v0.0.0-20190602130007-e65ca70987a6
+	k8s.io/cri-api v0.0.0-20190530055510-261df499b745 // indirect
 	k8s.io/utils v0.0.0-20190529001817-6999998975a7 // indirect
 )

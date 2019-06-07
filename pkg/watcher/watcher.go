@@ -89,7 +89,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 			continue
 		}
 
-		verification, err := verify.ImageID(status.ImageID, trustedKeys...)
+		hash, verification, err := verify.ImageID(status.ImageID, trustedKeys...)
 		if err != nil {
 			w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
 			continue
@@ -102,15 +102,16 @@ func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 			"container":    status.Name,
 			"image":        status.Image,
 			"imageID":      status.ImageID,
+			"hash":         hash,
 			"verification": string(b),
 			"status":       verification.Status,
 			"trusted":      verification.Trusted(),
 		}
 
 		if verification.Trusted() {
-			w.log.WithFields(fields).Infof(`Image "%s" (ImageID: %s) is trusted`, status.Image, status.ImageID)
+			w.log.WithFields(fields).Info("Image is trusted")
 		} else {
-			w.log.WithFields(fields).Warnf(`Image "%s" (ImageID: %s) is NOT trusted`, status.Image, status.ImageID)
+			w.log.WithFields(fields).Warn("Image is NOT trusted")
 		}
 	}
 }
