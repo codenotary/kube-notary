@@ -13,9 +13,9 @@ If you have RBAC enabled on your cluster, use the provided [kubernetes/clusterro
 kubectl apply -f kubernetes/clusterrolebinding.yaml
 ```
 
-Then create the configmap:
+Edit the provided [kubernetes/configmap.yaml](kubernetes/configmap.yaml) if needed. Then create the configmap:
 ```
-kubectl apply -f kubernetes/clusterrolebinding.yaml
+kubectl apply -f kubernetes/configmap.yaml
 ```
 > `kubewatch` supports configuration hot-reloading. You can modify and apply the configmap while `kubewatch` is running.
 
