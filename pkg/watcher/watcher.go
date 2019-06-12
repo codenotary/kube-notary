@@ -9,11 +9,11 @@
 package watcher
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/vchain-us/kubewatch/pkg/config"
+	"github.com/vchain-us/kubewatch/pkg/metrics"
 	"github.com/vchain-us/kubewatch/pkg/verify"
 
 	log "github.com/sirupsen/logrus"
@@ -29,10 +29,11 @@ type Interface interface {
 type watchdog struct {
 	clientset *kubernetes.Clientset
 	log       *log.Logger
+	rec       metrics.Recorder
 	cfg       config.Interface
 }
 
-func New(clientset *kubernetes.Clientset, cfg config.Interface, logger *log.Logger) (Interface, error) {
+func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Recorder, logger *log.Logger) (Interface, error) {
 
 	if clientset == nil {
 		return nil, fmt.Errorf("clientset cannot be nil")
@@ -45,6 +46,7 @@ func New(clientset *kubernetes.Clientset, cfg config.Interface, logger *log.Logg
 	return &watchdog{
 		clientset: clientset,
 		log:       logger,
+		rec:       rec,
 		cfg:       cfg,
 	}, nil
 }
@@ -83,7 +85,6 @@ func (w *watchdog) Run() {
 
 func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 	for _, status := range pod.Status.ContainerStatuses {
-
 		if status.State.Running == nil {
 			w.log.Infof(`Container "%s" in pod "%s" is not running: skipped`, status.Name, pod.Name)
 			continue
@@ -95,23 +96,20 @@ func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 			continue
 		}
 
-		b, _ := json.Marshal(verification)
-
-		fields := log.Fields{
-			"pod":          pod.Name,
-			"container":    status.Name,
-			"image":        status.Image,
-			"imageID":      status.ImageID,
-			"hash":         hash,
-			"verification": string(b),
-			"status":       verification.Status,
-			"trusted":      verification.Trusted(),
+		metric := metrics.Metric{
+			Pod:             &pod,
+			ContainerStatus: &status,
+			Verification:    verification,
+			Hash:            hash,
 		}
 
+		fields := metric.LogFields()
 		if verification.Trusted() {
-			w.log.WithFields(fields).Info("Image is trusted")
+			w.log.WithFields(*fields).Info("Image is trusted")
 		} else {
-			w.log.WithFields(fields).Warn("Image is NOT trusted")
+			w.log.WithFields(*fields).Warn("Image is NOT trusted")
 		}
+
+		w.rec.Record(metric)
 	}
 }

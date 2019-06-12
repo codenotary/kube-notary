@@ -9,9 +9,12 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/vchain-us/kubewatch/pkg/config"
+	"github.com/vchain-us/kubewatch/pkg/metrics"
 	"github.com/vchain-us/kubewatch/pkg/watcher"
 
 	"k8s.io/client-go/kubernetes"
@@ -40,15 +43,22 @@ func main() {
 	}
 	// creates the logger
 	logger := logrus.New()
+	// creates the metrics recorder
+	recorder := metrics.NewRecorder()
 	// creates the watcher configuration
 	cfg, err := config.New()
 	if err != nil {
 		panic(err.Error())
 	}
 	// creates and run the watcher
-	w, err := watcher.New(clientset, cfg, logger)
+	w, err := watcher.New(clientset, cfg, recorder, logger)
 	if err != nil {
 		panic(err.Error())
 	}
-	w.Run()
+	go w.Run()
+
+	// The Handler function provides a default handler to expose metrics
+	// via an HTTP server. "/metrics" is the usual endpoint for that.
+	http.Handle("/metrics", metrics.Handler())
+	panic(http.ListenAndServe(":8080", nil))
 }
