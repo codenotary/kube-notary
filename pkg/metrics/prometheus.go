@@ -19,7 +19,7 @@ var (
 		"namespace",
 		"pod",
 		"container",
-		"container_id",
+		// "container_id", // not actually needed
 		"image",
 		"image_id",
 		"hash",
@@ -54,13 +54,13 @@ func Handler() http.Handler {
 
 func (p prometheusRecorder) Record(m Metric) {
 	labels := prometheus.Labels{
-		"namespace":    m.Pod.Namespace,
-		"pod":          m.Pod.Name,
-		"container":    m.ContainerStatus.Name,
-		"container_id": m.ContainerStatus.ContainerID,
-		"image":        m.ContainerStatus.Image,
-		"image_id":     m.ContainerStatus.ImageID,
-		"hash":         m.Hash,
+		"namespace": m.Pod.Namespace,
+		"pod":       m.Pod.Name,
+		"container": m.ContainerStatus.Name,
+		// "container_id": m.ContainerStatus.ContainerID,
+		"image":    m.ContainerStatus.Image,
+		"image_id": m.ContainerStatus.ImageID,
+		"hash":     m.Hash,
 	}
 
 	verificationStatus.With(labels).Set(float64(m.Verification.Status))
