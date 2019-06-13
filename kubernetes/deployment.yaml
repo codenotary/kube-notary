@@ -11,7 +11,7 @@ spec:
         app: kubewatch
       annotations:
         prometheus.io/scrape: 'true'
-        prometheus.io/port: '8080'
+        prometheus.io/port: '9581'
     spec:
       serviceAccountName: default
       volumes:
@@ -26,5 +26,5 @@ spec:
         - name: config-volume
           mountPath: /etc/kubewatch
         ports:
-        - containerPort: 8080
+        - containerPort: 9581
           protocol: TCP

@@ -60,5 +60,5 @@ func main() {
 	// The Handler function provides a default handler to expose metrics
 	// via an HTTP server. "/metrics" is the usual endpoint for that.
 	http.Handle("/metrics", metrics.Handler())
-	panic(http.ListenAndServe(":8080", nil))
+	panic(http.ListenAndServe(":9581", nil))
 }
