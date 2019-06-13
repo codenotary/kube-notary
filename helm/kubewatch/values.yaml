@@ -2,12 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Runtime config
 log:
   level: debug
 watch: 
   namespace: ""
   interval: 60s
 
+# Installation config
 service:
   type: ClusterIP
   port: 9581
