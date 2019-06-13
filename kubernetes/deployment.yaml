@@ -9,6 +9,9 @@ spec:
     metadata:
       labels:
         app: kubewatch
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8080'
     spec:
       serviceAccountName: default
       volumes:
@@ -22,3 +25,6 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/kubewatch
+        ports:
+        - containerPort: 8080
+          protocol: TCP

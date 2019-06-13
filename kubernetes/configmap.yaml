@@ -9,4 +9,4 @@ data:
       level: debug
     watch: 
       namespace: "default"
-      interval: 60s
+      interval: 30s
