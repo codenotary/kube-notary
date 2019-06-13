@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "kubewatch.fullname" . }}
+  labels:
+{{ include "kubewatch.labels" . | indent 4 }}
+data:
+  config.yaml: |-
+    log:
+      level: {{ .Values.log.level }}
+    watch: 
+      namespace: {{ .Values.watch.namespace }}
+      interval: {{ .Values.watch.interval }}

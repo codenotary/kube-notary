@@ -1,0 +1,15 @@
+Kubewatch is installed in your cluster.
+
+Examples:
+ 
+{{- if contains "ClusterIP" .Values.service.type }}
+  # Metrics endpoint
+  export SERVICE_NAME=service/$(kubectl get service --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "kubewatch.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  echo "Check metrics endpoint at http://127.0.0.1:{{ .Values.service.port }}/metrics"
+  kubectl port-forward --namespace {{ .Release.Namespace }} $SERVICE_NAME {{ .Values.service.port }}
+{{- end }}
+
+  # Stream logs
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "kubewatch.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl logs --namespace {{ .Release.Namespace }} -f $POD_NAME
+
