@@ -19,3 +19,7 @@ image:
 .PHONY: image.push
 image.push: image
 	$(DOCKER) push $(REGISTRY_IMAGE)
+
+.PHONY: test/e2e
+test/e2e:
+	cd ./test/e2e && ./run.sh
