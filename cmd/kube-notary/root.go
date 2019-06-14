@@ -13,9 +13,9 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/vchain-us/kubewatch/pkg/config"
-	"github.com/vchain-us/kubewatch/pkg/metrics"
-	"github.com/vchain-us/kubewatch/pkg/watcher"
+	"github.com/vchain-us/kube-notary/pkg/config"
+	"github.com/vchain-us/kube-notary/pkg/metrics"
+	"github.com/vchain-us/kube-notary/pkg/watcher"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"

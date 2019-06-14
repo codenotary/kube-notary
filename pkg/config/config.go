@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultConfigPath = "/etc/kubewatch/config.yaml"
+	defaultConfigPath = "/etc/kube-notary/config.yaml"
 
 	// Constants for viper variable names
 	varLogLevel       = "log.level"
@@ -22,7 +22,7 @@ const (
 	varTrustKeys      = "trust.keys"
 )
 
-// Interface is the kubewatch configuration
+// Interface is the kube-notary configuration
 type Interface interface {
 	LogLevel() log.Level
 	Namespace() string
@@ -34,7 +34,7 @@ type cfg struct {
 	v *viper.Viper
 }
 
-// New returns a kubewatch configuration instance
+// New returns a kube-notary configuration instance
 func New() (Interface, error) {
 	v := viper.New()
 	c := &cfg{

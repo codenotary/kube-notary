@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "kubewatch.fullname" . }}
+  name: {{ include "kube-notary.fullname" . }}
   labels:
-{{ include "kubewatch.labels" . | indent 4 }}
+{{ include "kube-notary.labels" . | indent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "kubewatch.name" . }}
+      app.kubernetes.io/name: {{ include "kube-notary.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "kubewatch.name" . }}
+        app.kubernetes.io/name: {{ include "kube-notary.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '9581'
     spec:
-      serviceAccountName: {{ include "kubewatch.fullname" . }}
+      serviceAccountName: {{ include "kube-notary.fullname" . }}
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -27,14 +27,14 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: {{ include "kubewatch.fullname" . }}
+            name: {{ include "kube-notary.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
           - name: config-volume
-            mountPath: /etc/kubewatch
+            mountPath: /etc/kube-notary
           ports:
           - containerPort: 9581
             name: metrics-port

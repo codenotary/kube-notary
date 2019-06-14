@@ -11,7 +11,7 @@ package verify
 import (
 	"strings"
 
-	"github.com/vchain-us/kubewatch/pkg/image"
+	"github.com/vchain-us/kube-notary/pkg/image"
 
 	"github.com/vchain-us/vcn/pkg/api"
 )

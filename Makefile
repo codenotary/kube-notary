@@ -3,14 +3,14 @@ SHELL=/bin/bash -o pipefail
 GO ?= go
 DOCKER ?= docker
 
-REGISTRY_IMAGE="quay.io/leogr/kubewatch:dev"
+REGISTRY_IMAGE="codenotary/kube-notary:dev"
 
 export GO111MODULE=on
 
 
-.PHONY: kubewatch
-kubewatch:
-	GOOS=linux GOARCH=amd64 $(GO) build ./cmd/kubewatch
+.PHONY: kube-notary
+kube-notary:
+	GOOS=linux GOARCH=amd64 $(GO) build ./cmd/kube-notary
 
 .PHONY: image
 image:

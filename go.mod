@@ -1,4 +1,4 @@
-module github.com/vchain-us/kubewatch
+module github.com/vchain-us/kube-notary
 
 go 1.12
 

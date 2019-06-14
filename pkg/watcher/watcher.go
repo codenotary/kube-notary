@@ -12,9 +12,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/vchain-us/kubewatch/pkg/config"
-	"github.com/vchain-us/kubewatch/pkg/metrics"
-	"github.com/vchain-us/kubewatch/pkg/verify"
+	"github.com/vchain-us/kube-notary/pkg/config"
+	"github.com/vchain-us/kube-notary/pkg/metrics"
+	"github.com/vchain-us/kube-notary/pkg/verify"
 
 	log "github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
