@@ -17,6 +17,8 @@ Then, to install `kube-notary`:
 helm install -n kube-notary helm/kube-notary
 ```
 
+Alternatively, it's possible to manually install `kube-notary` without using Helm. Templates for manual installation are within the [kubernetes folder](kubernetes).
+
 ## Usage
 
 `kube-notary` provides both detailed log output and a Prometheus metrics endpoint to monitor the verification status of your running containers. After the installation you will find instruction to get them.

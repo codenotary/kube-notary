@@ -1,0 +1,19 @@
+---
+# Source: kube-notary/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-notary
+  labels:
+    app.kubernetes.io/name: kube-notary
+    app.kubernetes.io/instance: kube-notary
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9581
+      targetPort: metrics-port
+      protocol: TCP
+      name: metrics-port
+  selector:
+    app.kubernetes.io/name: kube-notary
+    app.kubernetes.io/instance: kube-notary
