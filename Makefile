@@ -26,6 +26,12 @@ kubernetes/kube-notary:
 	$(HELM) template -n kube-notary helm/kube-notary --output-dir ./kubernetes
 	for f in ./kubernetes/kube-notary/templates/*; do grep -E "helm|Tiller" -v $$f > $$f.tmp; rm $$f; mv $$f.tmp $$f; done
 
+.PHONY: test/e2e.local
+test/e2e.local:
+	cd ./test/e2e && ./run.sh
+
 .PHONY: test/e2e
 test/e2e:
-	cd ./test/e2e && ./run.sh
+	$(DOCKER) build -t kube-notary-test-e2e -f Dockerfile.test-e2e .
+	$(DOCKER) run --rm -v "/var/run/docker.sock:/var/run/docker.sock:ro" --network host kube-notary-test-e2e
+
