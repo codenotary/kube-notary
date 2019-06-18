@@ -7,6 +7,7 @@ Edit files within [kube-notary/templates](kube-notary/templates) accordingly to 
 ```
  kubectl apply \
     -f kube-notary/templates/serviceaccount.yaml \
+    -f kube-notary/templates/clusterrole.yaml \
     -f kube-notary/templates/clusterrolebinding.yaml \
     -f kube-notary/templates/configmap.yaml \
     -f kube-notary/templates/deployment.yaml \
