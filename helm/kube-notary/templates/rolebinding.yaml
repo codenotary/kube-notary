@@ -1,12 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
+{{ if .Values.watch.namespace }}kind: RoleBinding{{ else }}kind: ClusterRoleBinding{{ end }}
 metadata:
-  name: {{ include "kube-notary.fullname" . }}
+  name: {{ include "kube-notary.fullname" . }}{{ if .Values.watch.namespace }}
+  namespace: {{ .Values.watch.namespace }}{{ end }}
   labels:
 {{ include "kube-notary.labels" . | indent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  {{ if .Values.watch.namespace }}kind: Role{{ else }}kind: ClusterRole{{ end }}
   name: {{ include "kube-notary.fullname" . }}
 subjects:
 - kind: ServiceAccount

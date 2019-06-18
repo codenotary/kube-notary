@@ -1,0 +1,16 @@
+---
+# Source: kube-notary/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-notary
+  labels:
+    app.kubernetes.io/name: kube-notary
+    app.kubernetes.io/instance: kube-notary
+data:
+  config.yaml: |-
+    log:
+      level: debug
+    watch: 
+      namespace: default
+      interval: 60s

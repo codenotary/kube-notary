@@ -1,9 +1,10 @@
 ---
-# Source: kube-notary/templates/clusterrole.yaml
+# Source: kube-notary/templates/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: kube-notary
+  namespace: default
   labels:
     app.kubernetes.io/name: kube-notary
     app.kubernetes.io/instance: kube-notary

@@ -1,9 +1,12 @@
+---
+# Source: kube-notary/templates/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "kube-notary.fullname" . }}
+  name: kube-notary
   labels:
-{{ include "kube-notary.labels" . | indent 4 }}
+    app.kubernetes.io/name: kube-notary
+    app.kubernetes.io/instance: kube-notary
 rules:
 - apiGroups: [""]
   resources: ["namespaces", "namespaces/status", "secrets", "serviceaccounts", "pods", "pods/status", "pod/logs"]

@@ -17,7 +17,24 @@ Then, to install `kube-notary`:
 helm install -n kube-notary helm/kube-notary
 ```
 
+### Namespaced
+
+If you do not have cluster-wide access, you can still install `kube-notary` within a single namespace, using:
+```
+helm install -n kube-notary helm/kube-notary --set watch.namespace="default"
+```
+
+When configured so, a namespaced `Role` will be created instead of the default `ClusterRole` to accomodate Kubernetes [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) for a single namespace. `kube-notary` will get permission for and will watch at the configured namespace only.
+
+### Without helm
 Alternatively, it's possible to manually install `kube-notary` without using Helm. Templates for manual installation are within the [kubernetes folder](kubernetes).
+
+## Uninstall
+
+You can uninstall `kube-notary` at any time using:
+```
+helm delete --purge kube-notary
+```
 
 ## Usage
 

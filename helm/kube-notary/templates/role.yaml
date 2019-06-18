@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+{{ if .Values.watch.namespace }}kind: Role{{ else }}kind: ClusterRole{{ end }}
+metadata:
+  name: {{ include "kube-notary.fullname" . }}{{ if .Values.watch.namespace }}
+  namespace: {{ .Values.watch.namespace }}{{ end }}
+  labels:
+{{ include "kube-notary.labels" . | indent 4 }}
+rules:
+- apiGroups: [""]
+  resources: ["namespaces", "namespaces/status", "secrets", "serviceaccounts", "pods", "pods/status", "pod/logs"]
+  verbs: ["get", "list", "watch"]

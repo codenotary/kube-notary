@@ -21,8 +21,13 @@ image:
 image.push: image
 	$(DOCKER) push $(REGISTRY_IMAGE)
 
-.PHONY: kubernetes/kube-notary
-kubernetes/kube-notary:
+.PHONY: kubernetes
+kubernetes:
+	rm -rf kubernetes/kube-notary
+	rm -rf kubernetes/kube-notary-namespaced
+	$(HELM) template -n kube-notary helm/kube-notary --set watch.namespace="default" --output-dir ./kubernetes
+	for f in ./kubernetes/kube-notary/templates/*; do grep -E "helm|Tiller" -v $$f > $$f.tmp; rm $$f; mv $$f.tmp $$f; done
+	mv kubernetes/kube-notary kubernetes/kube-notary-namespaced
 	$(HELM) template -n kube-notary helm/kube-notary --output-dir ./kubernetes
 	for f in ./kubernetes/kube-notary/templates/*; do grep -E "helm|Tiller" -v $$f > $$f.tmp; rm $$f; mv $$f.tmp $$f; done
 

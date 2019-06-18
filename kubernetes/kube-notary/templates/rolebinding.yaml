@@ -1,5 +1,5 @@
 ---
-# Source: kube-notary/templates/clusterrolebinding.yaml
+# Source: kube-notary/templates/rolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
