@@ -5,7 +5,7 @@
  * https://www.gnu.org/licenses/gpl-3.0.en.html
  *
  */
-package image
+package registry
 
 import (
 	"fmt"
@@ -13,18 +13,24 @@ import (
 
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
+	containerregistry "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 )
 
-func resolveManifest(image string) (string, error) {
-	ref, err := name.ParseReference(image)
+// Image provides access to an image reference
+func Image(imageRef string, keychain authn.Keychain) (containerregistry.Image, error) {
+	ref, err := name.ParseReference(imageRef)
 	if err != nil {
-		return "", fmt.Errorf("parsing reference %q: %v", image, err)
+		return nil, fmt.Errorf("parsing reference %q: %v", imageRef, err)
 	}
 
-	img, err := remote.Image(ref, remote.WithAuthFromKeychain(authn.DefaultKeychain))
+	return remote.Image(ref, remote.WithAuthFromKeychain(keychain))
+}
+
+func imageConfigDigest(imageRef string, keychain authn.Keychain) (string, error) {
+	img, err := Image(imageRef, keychain)
 	if err != nil {
-		return "", fmt.Errorf("reading image %q: %v", ref, err)
+		return "", fmt.Errorf("reading image %s: %v", imageRef, err)
 	}
 
 	configName, err := img.ConfigName()
@@ -35,8 +41,10 @@ func resolveManifest(image string) (string, error) {
 	return configName.String(), nil
 }
 
-// Digest returns the actual image's digest as string
-func Digest(imageID string) (string, error) {
+// Resolve returns the actual image id (ie. the digest of the image's configuration)
+// from a given ImageID of the container's image as per Kubernetes specs.
+// See https://github.com/google/go-containerregistry/blob/master/images/ociimage.jpeg
+func Resolve(imageID string, keychain authn.Keychain) (string, error) {
 
 	if strings.HasPrefix(imageID, "sha256:") { // not-pullable image
 		return imageID, nil
@@ -54,7 +62,7 @@ func Digest(imageID string) (string, error) {
 		default:
 			return "", fmt.Errorf("unsupported image format: %s", imageID)
 		}
-		return resolveManifest(ref)
+		return imageConfigDigest(ref, keychain)
 	}
 
 	return "", fmt.Errorf("unsupported image format: %s", imageID)

@@ -11,20 +11,24 @@ package verify
 import (
 	"strings"
 
-	"github.com/vchain-us/kube-notary/pkg/image"
-
+	"github.com/vchain-us/kube-notary/pkg/registry"
 	"github.com/vchain-us/vcn/pkg/api"
 )
 
 // ImageID returns the hast string and the BlockchainVerification for the given imageID
-func ImageID(imageID string, signerKeys ...string) (hash string, verification *api.BlockchainVerification, err error) {
-	digest, err := image.Digest(imageID)
+func ImageID(imageID string, options ...Option) (hash string, verification *api.BlockchainVerification, err error) {
+	o, err := makeOptions(options...)
+	if err != nil {
+		return
+	}
+
+	digest, err := registry.Resolve(imageID, o.keychain)
 	if err != nil {
 		return
 	}
 	hash = strings.TrimPrefix(digest, "sha256:")
-	if len(signerKeys) > 0 {
-		verification, err = api.BlockChainVerifyMatchingPublicKeys(hash, signerKeys)
+	if len(o.signerKeys) > 0 {
+		verification, err = api.BlockChainVerifyMatchingPublicKeys(hash, o.signerKeys)
 	} else {
 		verification, err = api.BlockChainVerify(hash)
 	}

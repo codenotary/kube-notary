@@ -14,6 +14,7 @@ import (
 
 	"github.com/vchain-us/kube-notary/pkg/config"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
+	"github.com/vchain-us/kube-notary/pkg/registry"
 	"github.com/vchain-us/kube-notary/pkg/verify"
 
 	log "github.com/sirupsen/logrus"
@@ -84,13 +85,33 @@ func (w *watchdog) Run() {
 }
 
 func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
+
+	pullSecrets := make([]string, len(pod.Spec.ImagePullSecrets))
+	for i, localRef := range pod.Spec.ImagePullSecrets {
+		pullSecrets[i] = localRef.Name
+	}
+
+	keychain, err := registry.NewKeychain(
+		w.clientset,
+		pod.Namespace,
+		pod.Spec.ServiceAccountName,
+		pullSecrets,
+	)
+	if err != nil {
+		w.log.Warnf(`Keychain error in pod "%s": %s`, pod.Name, err)
+	}
+
 	for _, status := range pod.Status.ContainerStatuses {
 		if status.State.Running == nil {
 			w.log.Infof(`Container "%s" in pod "%s" is not running: skipped`, status.Name, pod.Name)
 			continue
 		}
 
-		hash, verification, err := verify.ImageID(status.ImageID, trustedKeys...)
+		hash, verification, err := verify.ImageID(
+			status.ImageID,
+			verify.WithAuthKeychain(keychain),
+			verify.WithSignerKeys(trustedKeys...),
+		)
 		if err != nil {
 			w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
 			continue
