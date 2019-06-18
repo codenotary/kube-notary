@@ -46,7 +46,7 @@ By default, `kube-notary` is installed into the current namespace (you can chang
 At install time you can change any values of [helm/kube-notary/values.yaml](helm/kube-notary/values.yaml) by using the Helm's `--set` option.
 For example, to instruct `kube-notary` to check only the `kube-system` namespace, just use:
 ```
-helm install -n kube-notary helm/kube-notary watch.namespace="kube-system"
+helm install -n kube-notary helm/kube-notary --set watch.namespace="kube-system"
 ```
 
 ### Runtime configuration
