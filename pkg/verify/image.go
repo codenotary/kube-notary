@@ -11,7 +11,7 @@ package verify
 import (
 	"strings"
 
-	"github.com/vchain-us/kube-notary/pkg/registry"
+	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/vcn/pkg/api"
 )
 
@@ -22,7 +22,7 @@ func ImageID(imageID string, options ...Option) (hash string, verification *api.
 		return
 	}
 
-	digest, err := registry.Resolve(imageID, o.keychain)
+	digest, err := image.Resolve(imageID, o.keychain)
 	if err != nil {
 		return
 	}

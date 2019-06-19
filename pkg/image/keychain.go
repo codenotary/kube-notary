@@ -5,7 +5,7 @@
  * https://www.gnu.org/licenses/gpl-3.0.en.html
  *
  */
-package registry
+package image
 
 import (
 	"github.com/google/go-containerregistry/pkg/authn"

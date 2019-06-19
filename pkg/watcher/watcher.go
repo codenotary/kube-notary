@@ -14,7 +14,7 @@ import (
 
 	"github.com/vchain-us/kube-notary/pkg/config"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
-	"github.com/vchain-us/kube-notary/pkg/registry"
+	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/kube-notary/pkg/verify"
 
 	log "github.com/sirupsen/logrus"
@@ -91,7 +91,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 		pullSecrets[i] = localRef.Name
 	}
 
-	keychain, err := registry.NewKeychain(
+	keychain, err := image.NewKeychain(
 		w.clientset,
 		pod.Namespace,
 		pod.Spec.ServiceAccountName,

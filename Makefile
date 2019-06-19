@@ -5,6 +5,7 @@ DOCKER ?= docker
 HELM ?= helm
 
 REGISTRY_IMAGE="codenotary/kube-notary:dev"
+TEST_FLAGS ?= -v -race
 
 export GO111MODULE=on
 
@@ -30,6 +31,11 @@ kubernetes:
 	mv kubernetes/kube-notary kubernetes/kube-notary-namespaced
 	$(HELM) template -n kube-notary helm/kube-notary --output-dir ./kubernetes
 	for f in ./kubernetes/kube-notary/templates/*; do grep -E "helm|Tiller" -v $$f > $$f.tmp; rm $$f; mv $$f.tmp $$f; done
+
+.PHONY: test
+test:
+	$(GO) vet ./...
+	$(GO) test ${TEST_FLAGS} ./...
 
 .PHONY: test/e2e.local
 test/e2e.local:
