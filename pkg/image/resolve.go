@@ -73,7 +73,20 @@ func configDigest(imageRef string, keychain authn.Keychain) (string, error) {
 //    https://github.com/google/go-containerregistry/blob/master/pkg/v1/remote/descriptor.go#L111
 //    https://github.com/google/go-containerregistry/issues/377
 func Resolve(imageID string, keychain authn.Keychain) (string, error) {
+	if hash := hashCache.Get(imageID); hash != "" {
+		return hash, nil
+	}
 
+	hash, err := resolve(imageID, keychain)
+	if err != nil {
+		return hash, err
+	}
+
+	hashCache.Set(imageID, hash)
+	return hash, err
+}
+
+func resolve(imageID string, keychain authn.Keychain) (string, error) {
 	// Docker pre-pulled image
 	if strings.HasPrefix(imageID, DockerImageIDPrefix+SHA256DigestPrefix) {
 		return strings.TrimPrefix(imageID, DockerImageIDPrefix), nil
