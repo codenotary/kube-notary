@@ -87,3 +87,7 @@ kubectl patch configmaps/kube-notary \
     -p '{"data":{"config.yaml":"log:\n  level: debug\nwatch: \n  namespace: \n  interval: 30s"}}'
 ```
 
+## License
+
+This software is released under [GPL3](https://www.gnu.org/licenses/gpl-3.0.en.html).
+
