@@ -1,8 +1,6 @@
 # kube-notary
 > A Kubernetes watchdog for verifying image trust with CodeNotary.
 
-*Work in progress!*
-
 ## How it works
 
 **kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [CodeNotary](https://codenotary.io). 
@@ -111,9 +109,12 @@ kubectl patch configmaps/kube-notary \
 
 ## FAQ
 
-### Notifications
+### Why *Continuous Verification* ?
 
-*TODO*
+Things change over time. Suppose you signed an image because you trust it. Later, you find a security issue within the image or you just want to deprecate that version. When that happens you can simply use [vcn](https://github.com/vchain-us/vcn#basic-usage) to untrust or unsupport that image version. Once the image is not trusted anymore, 
+thanks to `kube-notary` you can easily discover if the image is still running somewhere in your cluster.
+
+In general, verifing the image just before the execution is not enough because the image's status or the image that's used by a container can change over time. *Continuous Verification* ensures that you will always get noticed if an unwanted behavior occurs.
 
 ### How can I sign my image?
 
@@ -124,13 +125,11 @@ You have just to pull the image you want to sign, then finally run `vcn sign`. D
 
 Furthermore, if you want to bulk sign all images running inside your cluster, you will find **here** a script to automate the process.
 
+### How can I be notified when untrusted images are runnig?
 
-### Why *Continuous Verification* ?
+First, Prometheus and Grafana need to be installed in your cluster.
 
-Things change over time. Suppose you signed an image because you trust it. Later, you find a security issue within the image or you just want to deprecate that version. When that happens you can simply use [vcn](https://github.com/vchain-us/vcn#basic-usage) to untrust or unsupport that image version. Once the image is not trusted anymore, 
-thanks to `kube-notary` you can easily discover if the image is still running somewhere in your cluster.
-
-In general, verifing the image just before the execution is not enough because the image's status or the image that's used by a container can change over time. *Continuous Verification* ensures that you will always get noticed if an unwanted behavior occurs.
+Then it's easy to [create alerts](grafana#creating-alerts) using the provided [Grafana dashboard](grafana)
 
 ### Cannot create resource "clusterrolebindings"
 
@@ -150,6 +149,11 @@ $ kubectl create -f rbac-config.yaml
 serviceaccount "tiller" created
 clusterrolebinding "tiller" created
 $ helm init --service-account tiller --history-max 200
+```
+
+## Testing
+```
+make test/e2e
 ```
 
 ## License
