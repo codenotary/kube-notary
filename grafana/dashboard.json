@@ -17,6 +17,12 @@
       "version": "6.2.0"
     },
     {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": ""
+    },
+    {
       "type": "datasource",
       "id": "prometheus",
       "name": "Prometheus",
@@ -74,7 +80,7 @@
         "thresholdMarkers": true
       },
       "gridPos": {
-        "h": 3,
+        "h": 2,
         "w": 2,
         "x": 0,
         "y": 0
@@ -141,345 +147,142 @@
       "valueName": "current"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": true,
-      "colorValue": false,
-      "colors": [
-        "#F2495C",
-        "#F2495C",
-        "#299c46"
-      ],
-      "datasource": "${DS_PROMETHEUS}",
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
       "decimals": 0,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
+      "fill": 1,
       "gridPos": {
-        "h": 3,
-        "w": 2,
+        "h": 6,
+        "w": 22,
         "x": 2,
         "y": 0
       },
-      "id": 6,
-      "interval": null,
+      "id": 11,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": false,
+      "linewidth": 1,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
+      "nullPointMode": "null as zero",
+      "options": {},
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
         {
-          "name": "value to text",
-          "value": 1
+          "alias": "Trusted",
+          "color": "#73BF69"
         },
         {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "options": {},
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
+          "alias": "Unknown",
+          "color": "#F2495C"
+        },
         {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
+          "alias": "Untrusted",
+          "color": "#F2495C"
+        },
+        {
+          "alias": "Unsupported",
+          "color": "#F2495C"
         }
       ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
           "expr": "count(vcn_verification_status==0)",
           "format": "time_series",
-          "instant": false,
+          "instant": true,
+          "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "",
+          "legendFormat": "Trusted",
           "refId": "A"
-        }
-      ],
-      "thresholds": "1,2",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Trusted Container",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": true,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "#FA6400",
-        "#FA6400"
-      ],
-      "datasource": "${DS_PROMETHEUS}",
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 2,
-        "x": 4,
-        "y": 0
-      },
-      "id": 9,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
         },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "options": {},
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
         {
           "expr": "count(vcn_verification_status==2)",
           "format": "time_series",
-          "instant": false,
+          "instant": true,
           "intervalFactor": 1,
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": "1,2",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Unknown Container",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": true,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "#F2495C",
-        "#d44a3a"
-      ],
-      "datasource": "${DS_PROMETHEUS}",
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 2,
-        "x": 6,
-        "y": 0
-      },
-      "id": 7,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
+          "legendFormat": "Unknown",
+          "refId": "B"
         },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "options": {},
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
         {
           "expr": "count(vcn_verification_status==1)",
           "format": "time_series",
-          "instant": false,
+          "instant": true,
           "intervalFactor": 1,
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": "1,2",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Untrusted Container",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": true,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "#F2495C",
-        "#d44a3a"
-      ],
-      "datasource": "${DS_PROMETHEUS}",
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 2,
-        "x": 8,
-        "y": 0
-      },
-      "id": 8,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
+          "legendFormat": "Untrusted",
+          "refId": "C"
         },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "options": {},
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
         {
           "expr": "count(vcn_verification_status==3)",
           "format": "time_series",
-          "instant": false,
+          "instant": true,
+          "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "",
-          "refId": "A"
+          "legendFormat": "Unsupported",
+          "refId": "D"
         }
       ],
-      "thresholds": "1,2",
+      "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
-      "title": "Unsupported Container",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
+      "title": "Status Count",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "series",
+        "name": null,
+        "show": true,
+        "values": [
+          "current"
+        ]
+      },
+      "yaxes": [
         {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
+          "decimals": 0,
+          "format": "none",
+          "label": "Container",
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "none",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
         }
       ],
-      "valueName": "current"
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "cacheTimeout": null,
@@ -492,6 +295,7 @@
       ],
       "datasource": "${DS_PROMETHEUS}",
       "decimals": 0,
+      "description": "",
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -501,10 +305,10 @@
         "thresholdMarkers": true
       },
       "gridPos": {
-        "h": 3,
+        "h": 2,
         "w": 2,
-        "x": 10,
-        "y": 0
+        "x": 0,
+        "y": 2
       },
       "id": 5,
       "interval": null,
@@ -555,7 +359,8 @@
       "thresholds": "1,2",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Verifiable Container",
+      "title": "Verifiable",
+      "transparent": true,
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -577,6 +382,7 @@
         "#F2495C"
       ],
       "datasource": "${DS_PROMETHEUS}",
+      "description": "",
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -586,10 +392,10 @@
         "thresholdMarkers": true
       },
       "gridPos": {
-        "h": 3,
+        "h": 2,
         "w": 2,
-        "x": 12,
-        "y": 0
+        "x": 0,
+        "y": 4
       },
       "id": 4,
       "interval": null,
@@ -640,7 +446,8 @@
       "thresholds": "1,2",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Not verifiable Container",
+      "title": "Not verifiable",
+      "transparent": true,
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -658,10 +465,10 @@
       "datasource": "${DS_PROMETHEUS}",
       "fontSize": "100%",
       "gridPos": {
-        "h": 15,
+        "h": 12,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 6
       },
       "id": 2,
       "links": [],
@@ -670,7 +477,7 @@
       "scroll": true,
       "showHeader": true,
       "sort": {
-        "col": 10,
+        "col": 15,
         "desc": true
       },
       "styles": [
@@ -679,22 +486,6 @@
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
           "pattern": "Time",
           "type": "date"
-        },
-        {
-          "alias": "Container",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "Metric",
-          "thresholds": [],
-          "type": "number",
-          "unit": "short"
         },
         {
           "alias": "Status",
@@ -707,6 +498,7 @@
           "decimals": 0,
           "mappingType": 1,
           "pattern": "Value #A",
+          "preserveFormat": true,
           "thresholds": [
             "1",
             "2"
@@ -734,7 +526,7 @@
         },
         {
           "alias": "Level",
-          "colorMode": "cell",
+          "colorMode": "value",
           "colors": [
             "rgba(245, 54, 54, 0.9)",
             "rgba(237, 129, 40, 0.89)",
@@ -756,7 +548,7 @@
               "value": "-1"
             },
             {
-              "text": "Unknown",
+              "text": "",
               "value": "0"
             },
             {
@@ -837,7 +629,7 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-1m",
     "to": "now"
   },
   "timepicker": {
