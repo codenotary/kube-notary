@@ -4,12 +4,12 @@
 ## How it works
 
 **kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [CodeNotary](https://codenotary.io). 
-The idea behind CV is to continuously monitor your cluster at runtime and be notified when unknown or untrusted container's images are running.
+The idea behind CV is to continuously monitor your cluster at runtime and be notified when unknown or untrusted container images are running.
 
 Once `kube-notary` is installed within your cluster, all pods are checked every minute (interval and other settings can be [configured](#Configuration)). 
-For each running containers in pods, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the hash's signature in the CodeNotary's blockchain.
+For each of the running containers in each pod, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the hash's signature in the CodeNotary's blockchain.
 
-Verification results will be available through a detailed log. Furthermore, `kube-notary` provides a built-in Prometheus exporter for verification [metrics](#Metrics) that can be easily visualized with the provided [grafana dashboard](grafana). 
+Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [Grafana dashboard](Grafana). 
 
 Images you trust can be signed by using the CodeNotary [vcn](https://github.com/vchain-us/vcn) CLI tool.
 
@@ -35,9 +35,9 @@ If you do not have cluster-wide access, you can still install `kube-notary` with
 helm install -n kube-notary helm/kube-notary --set watch.namespace="default"
 ```
 
-When so configured, a namespaced `Role` will be created instead of the default `ClusterRole` to accomodate Kubernetes [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) for a single namespace. `kube-notary` will get permission for, and will watch, the configured namespace only.
+When so configured, a namespaced `Role` will be created instead of the default `ClusterRole` to accommodate Kubernetes [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) for a single namespace. `kube-notary` will get permission for, and will watch, the configured namespace only.
 
-### Manual installation (no Helm)
+### Manual installation (without Helm)
 Alternatively, it is possible to manually install `kube-notary` without using Helm. Instructions and templates for manual installation are within the [kubernetes folder](kubernetes).
 
 ## Uninstall
