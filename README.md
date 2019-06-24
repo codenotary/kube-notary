@@ -9,7 +9,7 @@ The idea behind CV is to continuously monitor your cluster at runtime and be not
 Once `kube-notary` is installed within your cluster, all pods are checked every minute (interval and other settings can be [configured](#Configuration)). 
 For each of the running containers in each pod, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the hash's signature in the CodeNotary's blockchain.
 
-Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [Grafana dashboard](Grafana). 
+Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [Grafana dashboard](grafana). 
 
 Images you trust can be signed by using the CodeNotary [vcn](https://github.com/vchain-us/vcn) CLI tool.
 
