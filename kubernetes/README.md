@@ -1,7 +1,7 @@
 # Manual installation
 
 This folder contains templates to manually install `kube-notary` by using `kubectl`.
-Before proceeding, make sure your local config is pointing to the context you want to use (ie. check `kubectl config current-context`).
+Before proceeding, make sure your local config is pointing to the context you want to use (i.e. check `kubectl config current-context`).
 
 ## Cluster-wide
 

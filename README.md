@@ -4,12 +4,12 @@
 ## How it works
 
 **kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [CodeNotary](https://codenotary.io). 
-The idea behind CV is to continuously monitor your cluster at runtime and be notified when unknown or untrusted container's images are running.
+The idea behind CV is to continuously monitor your cluster at runtime and be notified when unknown or untrusted container images are running.
 
 Once `kube-notary` is installed within your cluster, all pods are checked every minute (interval and other settings can be [configured](#Configuration)). 
-For each running containers in pods, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the hash's signature in the CodeNotary's blockchain.
+For each of the running containers in each pod, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the hash's signature in the CodeNotary's blockchain.
 
-Verification results will be available through a detailed log. Furthermore, `kube-notary` provides a built-in Prometheus exporter for verification [metrics](#Metrics) that can be easily visualized with the provided [grafana dashboard](grafana). 
+Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [grafana dashboard](grafana). 
 
 Images you trust can be signed by using the CodeNotary [vcn](https://github.com/vchain-us/vcn) CLI tool.
 
@@ -35,9 +35,9 @@ If you do not have cluster-wide access, you can still install `kube-notary` with
 helm install -n kube-notary helm/kube-notary --set watch.namespace="default"
 ```
 
-When so configured, a namespaced `Role` will be created instead of the default `ClusterRole` to accomodate Kubernetes [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) for a single namespace. `kube-notary` will get permission for, and will watch, the configured namespace only.
+When so configured, a namespaced `Role` will be created instead of the default `ClusterRole` to accommodate Kubernetes [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) for a single namespace. `kube-notary` will get permission for, and will watch, the configured namespace only.
 
-### Manual installation (no Helm)
+### Manual installation (without Helm)
 Alternatively, it is possible to manually install `kube-notary` without using Helm. Instructions and templates for manual installation are within the [kubernetes folder](kubernetes).
 
 ## Uninstall
@@ -49,7 +49,7 @@ helm delete --purge kube-notary
 
 ## Usage
 
-`kube-notary` provides both detailed log output and a Prometheus metrics endpoint to monitor the verification status of your running containers. After the installation you will find instruction to get them.
+`kube-notary` provides both detailed log output and a Prometheus metrics endpoint to monitor the verification status of your running containers. After the installation you will find instructions on how to get them.
 
 Examples:
 ```
@@ -70,7 +70,7 @@ Examples:
 ### Metrics
 
 If a Prometheus installation is running within your cluster, metrics provided by `kube-notary` will be automatically discovered. 
-Furthermore, you can find an example of preconfigured Grafana dashboard [here](grafana/).
+Furthermore, you can find an example of a preconfigured Grafana dashboard [here](grafana/).
 
 ## Configuration
 
@@ -114,14 +114,14 @@ kubectl patch configmaps/kube-notary \
 Things change over time. Suppose you signed an image because you trust it. Later, you find a security issue within the image or you just want to deprecate that version. When that happens you can simply use [vcn](https://github.com/vchain-us/vcn#basic-usage) to untrust or unsupport that image version. Once the image is not trusted anymore, 
 thanks to `kube-notary` you can easily discover if the image is still running somewhere in your cluster.
 
-In general, verifing the image just before the execution is not enough because the image's status or the image that's used by a container can change over time. *Continuous Verification* ensures that you will always get noticed if an unwanted behavior occurs.
+In general, verifying an image just before its execution is not enough because the image's status or the image that's used by a container can change over time. *Continuous Verification* ensures that you will always get noticed if an unwanted behavior occurs.
 
 ### How can I sign my image?
 
 You can easily sign your container's images by using the [vcn CLI](https://github.com/vchain-us/vcn) we provide separately.
 
-`vcn` supports local docker installations out of the box using `docker://` prefix, followed by the image name or an image reference. 
-You have just to pull the image you want to sign, then finally run `vcn sign`. Detailed instructions can be found [here](https://github.com/vchain-us/vcn/blob/master/docs/DOCKERINTEGRATION.md).
+`vcn` supports local Docker installations out of the box using `docker://` prefix, followed by the image name or image reference. 
+You just have to pull the image you want to sign, then finally run `vcn sign`. Detailed instructions can be found [here](https://github.com/vchain-us/vcn/blob/master/docs/DOCKERINTEGRATION.md).
 
 Furthermore, if you want to bulk sign all images running inside your cluster, you will find **here** a script to automate the process.
 
@@ -133,9 +133,9 @@ Then it's easy to [create alerts](grafana#creating-alerts) using the provided [G
 
 ### Cannot create resource "clusterrolebindings"
 
-Recent versions of Kubernetes employ a [role-based access control](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) (or RBAC) system to to drive authorization decisions. It might be possible that your account does not have enough privileged to create the `ClusterRole` needed to get cluster-wide access.
+Recent versions of Kubernetes employ a [role-based access control](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) (or RBAC) system to drive authorization decisions. It might be possible that your account does not have enough privileges to create the `ClusterRole` needed to get cluster-wide access.
 
-Please use high privileged account to install `kube-notary`, alternatively if you don't have cluster-wide access, you can still install `kube-notary` to work in a single namespace you have access. See the [namespaced installation](#Namespaced) paragraph for further details.
+Please use a high privileged account to install `kube-notary`. Alternatively, if you don't have cluster-wide access, you can still install `kube-notary` to work in a single namespace which you can access. See the [namespaced installation](#Namespaced) paragraph for further details.
 
 ### Helm error: release kube-watch failed: namespaces "..." is forbidden
 It might be possible that `tiller` (the Helm's server-side component) does not have permission to install `kube-notary`. 
