@@ -14,7 +14,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/vchain-us/kube-notary/pkg/config"
-	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
 	"github.com/vchain-us/kube-notary/pkg/watcher"
 
@@ -61,10 +60,6 @@ func main() {
 	// The metrics.Handler provides a default handler to expose metrics
 	// via an HTTP server. "/metrics" is the usual endpoint for that.
 	http.Handle("/metrics", metrics.Handler())
-
-	// The image.CacheHandler provides a handler to expose the internal
-	// image resolution cache.
-	http.Handle("/images", image.CacheHandler())
 
 	// Healthcheck endpoint.
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
