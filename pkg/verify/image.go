@@ -9,21 +9,9 @@
 package verify
 
 import (
-	"strings"
-
 	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/vcn/pkg/api"
 )
-
-func getVerification(digest string, o *options) (hash string, verification *api.BlockchainVerification, err error) {
-	hash = strings.TrimPrefix(digest, "sha256:")
-	if len(o.signerKeys) > 0 {
-		verification, err = api.BlockChainVerifyMatchingPublicKeys(hash, o.signerKeys)
-	} else {
-		verification, err = api.BlockChainVerify(hash)
-	}
-	return
-}
 
 // ImageID returns the hast string and the BlockchainVerification for the given imageID
 func ImageID(imageID string, options ...Option) (hash string, verification *api.BlockchainVerification, err error) {

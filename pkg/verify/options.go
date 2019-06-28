@@ -16,8 +16,9 @@ import (
 type Option func(*options) error
 
 type options struct {
-	signerKeys []string
-	keychain   authn.Keychain
+	keys     []string
+	org      string
+	keychain authn.Keychain
 }
 
 func makeOptions(opts ...Option) (*options, error) {
@@ -38,9 +39,16 @@ func WithAuthKeychain(keychain authn.Keychain) Option {
 	}
 }
 
-func WithSignerKeys(signerKeys ...string) Option {
+func WithSignerKeys(keys ...string) Option {
 	return func(o *options) error {
-		o.signerKeys = signerKeys
+		o.keys = keys
+		return nil
+	}
+}
+
+func WithSignerOrg(org string) Option {
+	return func(o *options) error {
+		o.org = org
 		return nil
 	}
 }
