@@ -32,7 +32,7 @@ type Result struct {
 	Hash         string                      `json:"hash"`
 	Containers   []ContainerInfo             `json:"containers"`
 	Verification *vcn.BlockchainVerification `json:"verification,omitempty"`
-	Errors       []error                     `json:"errors,omitempty"`
+	Errors       []string                    `json:"errors,omitempty"`
 }
 
 func (w *watchdog) commit() {
@@ -67,15 +67,19 @@ func (w *watchdog) upsert(pod corev1.Pod, status corev1.ContainerStatus, hash st
 	r, found := w.res[hash]
 	if !found {
 		r = Result{
-			Hash:         hash,
-			Containers:   []ContainerInfo{},
-			Verification: v,
-			Errors:       errs,
+			Hash:       hash,
+			Containers: []ContainerInfo{},
 		}
 	}
 
 	// update verification
 	r.Verification = v
+
+	// update errors
+	r.Errors = make([]string, len(errs))
+	for i, err := range errs {
+		r.Errors[i] = err.Error()
+	}
 
 	// update containers info
 	found = false
