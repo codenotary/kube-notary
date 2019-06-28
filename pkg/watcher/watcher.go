@@ -73,10 +73,26 @@ func (w *watchdog) Run() {
 		ns := w.cfg.Namespace()
 		sleep := w.cfg.Interval()
 		keys := w.cfg.TrustedKeys()
+		org := w.cfg.TrustedOrg()
 		fields := log.Fields{
-			"namespace":   ns,
-			"interval":    sleep,
-			"trustedKeys": keys,
+			config.LogLevel:       w.cfg.LogLevel().String(),
+			config.WatchNamespace: ns,
+			config.WatchInterval:  sleep,
+			config.TrustKeys:      keys,
+		}
+
+		var opt verify.Option
+
+		if org != "" {
+			delete(fields, config.TrustKeys)
+			fields[config.TrustOrg] = org
+			opt = verify.WithSignerOrg(org)
+			if len(keys) > 0 {
+				w.log.WithFields(fields).Warn("Trusted keys ignored because an organization is set")
+				keys = nil
+			}
+		} else if len(keys) > 0 {
+			opt = verify.WithSignerKeys(keys...)
 		}
 
 		pods, err := clientset.CoreV1().Pods(ns).List(metav1.ListOptions{})
@@ -88,7 +104,7 @@ func (w *watchdog) Run() {
 			w.log.WithFields(fields).Debug("Verification started")
 
 			for _, pod := range pods.Items {
-				w.watchPod(pod, keys...)
+				w.watchPod(pod, opt)
 			}
 		}
 
@@ -99,7 +115,7 @@ func (w *watchdog) Run() {
 	}
 }
 
-func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
+func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 
 	pullSecrets := make([]string, len(pod.Spec.ImagePullSecrets))
 	for i, localRef := range pod.Spec.ImagePullSecrets {
@@ -116,6 +132,12 @@ func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 		w.log.Warnf(`Keychain error in pod "%s": %s`, pod.Name, err)
 	}
 
+	// make options
+	l := len(options) + 1
+	opts := make([]verify.Option, len(options)+1)
+	copy(opts, options)
+	opts[l-1] = verify.WithAuthKeychain(keychain)
+
 	for _, status := range pod.Status.ContainerStatuses {
 		if status.State.Running == nil {
 			w.log.Infof(`Container "%s" in pod "%s" is not running: skipped`, status.Name, pod.Name)
@@ -124,8 +146,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 		errors := make([]error, 0)
 		hash, verification, err := verify.ImageID(
 			status.ImageID,
-			verify.WithAuthKeychain(keychain),
-			verify.WithSignerKeys(trustedKeys...),
+			opts...,
 		)
 
 		if err != nil {

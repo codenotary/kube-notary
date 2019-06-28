@@ -7,7 +7,7 @@
 The idea behind CV is to continuously monitor your cluster at runtime and be notified when unknown or untrusted container images are running.
 
 Once `kube-notary` is installed within your cluster, all pods are checked every minute (interval and other settings can be [configured](#Configuration)). 
-For each of the running containers in each pod, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the hash's signature in the CodeNotary's blockchain.
+For each of the running containers in each pod, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the [hash's signature in the CodeNotary's blockchain](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#signatures).
 
 Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [grafana dashboard](grafana). 
 
@@ -27,6 +27,7 @@ Then, to install `kube-notary`:
 ```
 helm install -n kube-notary helm/kube-notary
 ```
+> See the [Configuration](#Configuration) paragraph for detailed instructions.
 
 ### Namespaced
 
@@ -82,6 +83,28 @@ For example, to instruct `kube-notary` to check only the `kube-system` namespace
 helm install -n kube-notary helm/kube-notary --set watch.namespace="kube-system"
 ```
 
+### Trusted signers
+
+Choosing signers who can be trusted is easy. At install time, you can `--set` one of the following options.
+
+#### Configure a list of trusted keys
+
+Lists can be expressed by enclosing keys in `{` and `}` separated by `,`. For example:
+```
+helm install -n kube-notary helm/kube-notary --set "trust.keys={0x123..., 0x123...}"
+```
+
+#### Configure a trusted organization
+
+```
+helm install -n kube-notary helm/kube-notary --set "trust.org=your.organization.com"
+```
+
+#### Note 
+If both `trust.org` and `trust.keys` are set, only `trust.org` will be used. 
+
+If none is set, the last [signature](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#signatures) by the signer with the highest available [level](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#level) will be used during the verification.
+
 ### Runtime configuration
 
 The following options within [helm/kube-notary/values.yaml](helm/kube-notary/values.yaml) have effect on the `kube-notary` runtime behavior.
@@ -93,6 +116,7 @@ watch:
   namespace: "" # the namespace name to watch 
   interval: 60s # duration of the watching interval
 trust:
+  org: "" # ID of the trusted organization, if not empty `keys` above will be ignored
   keys: # array of signing keys to verify against
    - ...
    - ...
@@ -111,7 +135,7 @@ kubectl patch configmaps/kube-notary \
 
 ### Why *Continuous Verification* ?
 
-Things change over time. Suppose you signed an image because you trust it. Later, you find a security issue within the image or you just want to deprecate that version. When that happens you can simply use [vcn](https://github.com/vchain-us/vcn#basic-usage) to untrust or unsupport that image version. Once the image is not trusted anymore, 
+Things change over time. Suppose you signed an image because you trust it. Later, you find a security issue within the image or you just want to deprecate that version. When that happens you can simply use [vcn](https://github.com/vchain-us/vcn#basic-usage) to [untrust or unsupport](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#statuses) that image version. Once the image is not trusted anymore, 
 thanks to `kube-notary` you can easily discover if the image is still running somewhere in your cluster.
 
 In general, verifying an image just before its execution is not enough because the image's status or the image that's used by a container can change over time. *Continuous Verification* ensures that you will always get noticed if an unwanted behavior occurs.

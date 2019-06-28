@@ -8,6 +8,9 @@ log:
 watch: 
   namespace: ""
   interval: 60s
+trust:
+  org: ""
+  keys: []
 
 # Installation config
 service:

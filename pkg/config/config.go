@@ -12,14 +12,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Configuration variables names
+const (
+	LogLevel       = "log.level"
+	WatchNamespace = "watch.namespace"
+	WatchInterval  = "watch.interval"
+	TrustKeys      = "trust.keys"
+	TrustOrg       = "trust.org"
+)
+
 const (
 	defaultConfigPath = "/etc/kube-notary/config.yaml"
-
-	// Constants for viper variable names
-	varLogLevel       = "log.level"
-	varWatchNamespace = "watch.namespace"
-	varWatchInterval  = "watch.interval"
-	varTrustKeys      = "trust.keys"
 )
 
 // Interface is the kube-notary configuration
@@ -28,6 +31,7 @@ type Interface interface {
 	Namespace() string
 	Interval() time.Duration
 	TrustedKeys() []string
+	TrustedOrg() string
 }
 
 type cfg struct {
@@ -42,10 +46,11 @@ func New() (Interface, error) {
 	}
 
 	// Set defaults
-	v.SetDefault(varLogLevel, "info")
-	v.SetDefault(varWatchNamespace, "")
-	v.SetDefault(varWatchInterval, time.Second*60)
-	v.SetDefault(varTrustKeys, nil)
+	v.SetDefault(LogLevel, "info")
+	v.SetDefault(WatchNamespace, "")
+	v.SetDefault(WatchInterval, time.Second*60)
+	v.SetDefault(TrustKeys, nil)
+	v.SetDefault(TrustOrg, "")
 
 	// Setup
 	v.AutomaticEnv()
@@ -71,7 +76,7 @@ func New() (Interface, error) {
 
 // LogLevel returns the log level
 func (c cfg) LogLevel() log.Level {
-	logLevel := c.v.GetString(varLogLevel)
+	logLevel := c.v.GetString(LogLevel)
 	l, err := log.ParseLevel(logLevel)
 	if err != nil {
 		l = log.InfoLevel
@@ -81,15 +86,20 @@ func (c cfg) LogLevel() log.Level {
 
 // Namespace returns the namespace selector string
 func (c cfg) Namespace() string {
-	return c.v.GetString(varWatchNamespace)
+	return c.v.GetString(WatchNamespace)
 }
 
 // Interval returns the watching cycle interval as time.Duration
 func (c cfg) Interval() time.Duration {
-	return c.v.GetDuration(varWatchInterval)
+	return c.v.GetDuration(WatchInterval)
 }
 
 // TrustedKeys returns the trusted keys list as a slice of strings
 func (c cfg) TrustedKeys() []string {
-	return c.v.GetStringSlice(varTrustKeys)
+	return c.v.GetStringSlice(TrustKeys)
+}
+
+// TrustedOrg returns the trusted organization ID as string
+func (c cfg) TrustedOrg() string {
+	return c.v.GetString(TrustOrg)
 }

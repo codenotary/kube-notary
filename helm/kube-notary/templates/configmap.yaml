@@ -11,3 +11,9 @@ data:
     watch: 
       namespace: {{ .Values.watch.namespace }}
       interval: {{ .Values.watch.interval }}
+    trust: 
+      org: {{ .Values.trust.org }}
+      keys:
+        {{- range .Values.trust.keys }}
+        - {{ . | quote }}
+        {{- end }}
