@@ -10,11 +10,13 @@ package watcher
 
 import (
 	"fmt"
+	"net/http"
+	"sync"
 	"time"
 
 	"github.com/vchain-us/kube-notary/pkg/config"
-	"github.com/vchain-us/kube-notary/pkg/metrics"
 	"github.com/vchain-us/kube-notary/pkg/image"
+	"github.com/vchain-us/kube-notary/pkg/metrics"
 	"github.com/vchain-us/kube-notary/pkg/verify"
 
 	log "github.com/sirupsen/logrus"
@@ -25,6 +27,7 @@ import (
 
 type Interface interface {
 	Run()
+	ResultsHandler() http.Handler
 }
 
 type watchdog struct {
@@ -32,6 +35,11 @@ type watchdog struct {
 	log       *log.Logger
 	rec       metrics.Recorder
 	cfg       config.Interface
+	res       map[string]Result
+	tmp       []string
+	idx       []string
+	seen      map[string]bool
+	mu        *sync.RWMutex
 }
 
 func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Recorder, logger *log.Logger) (Interface, error) {
@@ -49,6 +57,11 @@ func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Reco
 		log:       logger,
 		rec:       rec,
 		cfg:       cfg,
+		res:       map[string]Result{},
+		tmp:       []string{},
+		idx:       []string{},
+		seen:      map[string]bool{},
+		mu:        &sync.RWMutex{},
 	}, nil
 }
 
@@ -79,6 +92,8 @@ func (w *watchdog) Run() {
 			}
 		}
 
+		// commit tmp list into results index
+		w.commit()
 		w.log.Debugf("Sleeping for %s", sleep)
 		time.Sleep(sleep)
 	}
@@ -106,31 +121,35 @@ func (w *watchdog) watchPod(pod corev1.Pod, trustedKeys ...string) {
 			w.log.Infof(`Container "%s" in pod "%s" is not running: skipped`, status.Name, pod.Name)
 			continue
 		}
-
+		errors := make([]error, 0)
 		hash, verification, err := verify.ImageID(
 			status.ImageID,
 			verify.WithAuthKeychain(keychain),
 			verify.WithSignerKeys(trustedKeys...),
 		)
+
 		if err != nil {
+			errors = append(errors, err)
 			w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
-			continue
-		}
-
-		metric := metrics.Metric{
-			Pod:             &pod,
-			ContainerStatus: &status,
-			Verification:    verification,
-			Hash:            hash,
-		}
-
-		fields := metric.LogFields()
-		if verification.Trusted() {
-			w.log.WithFields(*fields).Info("Image is trusted")
 		} else {
-			w.log.WithFields(*fields).Warn("Image is NOT trusted")
+			metric := metrics.Metric{
+				Pod:             &pod,
+				ContainerStatus: &status,
+				Verification:    verification,
+				Hash:            hash,
+			}
+
+			fields := metric.LogFields()
+			if verification.Trusted() {
+				w.log.WithFields(*fields).Info("Image is trusted")
+			} else {
+				w.log.WithFields(*fields).Warn("Image is NOT trusted")
+			}
+
+			w.rec.Record(metric)
 		}
 
-		w.rec.Record(metric)
+		// update or insert the result into tmp list
+		w.upsert(pod, status, hash, verification, errors)
 	}
 }

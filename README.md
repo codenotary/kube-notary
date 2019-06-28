@@ -58,9 +58,9 @@ Examples:
   echo "Check the metrics endpoint at http://127.0.0.1:9581/metrics"
   kubectl port-forward --namespace default $SERVICE_NAME 9581
 
-  # Images endpoint
+  # Results endpoint
   export SERVICE_NAME=service/$(kubectl get service --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
-  echo "Check the images endpoint at http://127.0.0.1:9581/images"
+  echo "Check the verification results endpoint at http://127.0.0.1:9581/results"
   kubectl port-forward --namespace default $SERVICE_NAME 9581
 
   # Stream logs

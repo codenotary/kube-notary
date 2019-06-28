@@ -61,6 +61,10 @@ func main() {
 	// via an HTTP server. "/metrics" is the usual endpoint for that.
 	http.Handle("/metrics", metrics.Handler())
 
+	// The w.ResultsHandler provides a handler to expose detailed
+	// verification results.
+	http.Handle("/results", w.ResultsHandler())
+
 	// Healthcheck endpoint.
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
