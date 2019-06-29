@@ -54,7 +54,7 @@ helm delete --purge kube-notary
 
 Examples:
 ```
-  # Metrics endpoint
+ # Metrics endpoint
   export SERVICE_NAME=service/$(kubectl get service --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
   echo "Check the metrics endpoint at http://127.0.0.1:9581/metrics"
   kubectl port-forward --namespace default $SERVICE_NAME 9581
@@ -67,6 +67,11 @@ Examples:
   # Stream logs
   export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
   kubectl logs --namespace default -f $POD_NAME
+
+  # Bulk sign all running images
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
+  kubectl exec --namespace default -t $POD_NAME sh /bin/bulk_sign > vcn_bulk_sign.sh
+  chmod +x vcn_bulk_sign.sh && ./vcn_bulk_sign.sh
 ```
 ### Metrics
 
@@ -147,7 +152,15 @@ You can easily sign your container's images by using the [vcn CLI](https://githu
 `vcn` supports local Docker installations out of the box using `docker://` prefix, followed by the image name or image reference. 
 You just have to pull the image you want to sign, then finally run `vcn sign`. Detailed instructions can be found [here](https://github.com/vchain-us/vcn/blob/master/docs/DOCKERINTEGRATION.md).
 
-Furthermore, if you want to bulk sign all images running inside your cluster, you will find **here** a script to automate the process.
+Furthermore, if you want to bulk sign all images running inside your cluster, you will find below instructions to generate a script that automates the process.
+
+Export `POD_NAME` setting it to the `kube-notary`'s pod name, then run:
+```
+kubectl exec --namespace default -t $POD_NAME sh /bin/bulk_sign > vcn_bulk_sign.sh
+chmod +x vcn_bulk_sign.sh && ./vcn_bulk_sign.sh
+```
+> Note that a [CodeNotary](https://codenotary.io) account and a local installation of [vcn](https://github.com/vchain-us/vcn) are needed.
+> Also, make sure your `kubectl` is pointing to the context you want to use. 
 
 ### How can I be notified when untrusted images are runnig?
 

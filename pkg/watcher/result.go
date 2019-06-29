@@ -111,9 +111,20 @@ func (w *watchdog) ResultsHandler() http.Handler {
 		ww.mu.RLock()
 		defer ww.mu.RUnlock()
 
+		// Make results
 		res := make([]Result, len(ww.idx))
 		for i, hash := range ww.idx {
 			res[i] = ww.res[hash]
+		}
+
+		if r.URL.Query().Get("output") == "bulk_sign" {
+			err := bulkSigningScript(w, res)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintln(w, err.Error())
+				return
+			}
+			return
 		}
 
 		b, err := json.Marshal(res)
