@@ -25,6 +25,9 @@ func makeOptions(opts ...Option) (*options, error) {
 	o := &options{}
 
 	for _, option := range opts {
+		if option == nil {
+			continue
+		}
 		if err := option(o); err != nil {
 			return nil, err
 		}
