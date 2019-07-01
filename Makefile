@@ -32,6 +32,10 @@ kubernetes:
 	$(HELM) template -n kube-notary helm/kube-notary --output-dir ./kubernetes
 	for f in ./kubernetes/kube-notary/templates/*; do grep -E "helm|Tiller" -v $$f > $$f.tmp; rm $$f; mv $$f.tmp $$f; done
 
+.PHONY: CHANGELOG.md
+CHANGELOG.md:
+	git-chglog -o CHANGELOG.md
+
 .PHONY: test
 test:
 	$(GO) vet ./...
