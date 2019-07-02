@@ -43,10 +43,12 @@ test:
 
 .PHONY: test/e2e.local
 test/e2e.local:
+	$(DOCKER) build -t kube-notary:test -f ./Dockerfile .
 	cd ./test/e2e && ./run.sh
 
 .PHONY: test/e2e
 test/e2e:
+	$(DOCKER) build -t kube-notary:test -f ./Dockerfile .
 	$(DOCKER) build -t kube-notary-test-e2e -f Dockerfile.test-e2e .
 	$(DOCKER) run --rm -v "/var/run/docker.sock:/var/run/docker.sock:ro" --network host kube-notary-test-e2e
 

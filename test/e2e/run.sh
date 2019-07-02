@@ -9,6 +9,7 @@ echo $(kind delete cluster --name=$CLUSTER_NAME 2>&1) > /dev/null
 
 # Create the cluster
 kind create cluster --name=$CLUSTER_NAME
+kind load docker-image --name=$CLUSTER_NAME kube-notary:test
 KUBECONFIG=$(kind get kubeconfig-path --name=$CLUSTER_NAME)
 CONTEXT=kubernetes-admin@$CLUSTER_NAME
 
@@ -17,7 +18,11 @@ kubectl --kubeconfig $KUBECONFIG --context $CONTEXT apply -f ./tiller-rbac.yaml
 helm init --kubeconfig $KUBECONFIG --kube-context $CONTEXT --service-account tiller --history-max 200 --wait
 
 # Install kube-notary chart
-helm install --kubeconfig $KUBECONFIG --kube-context $CONTEXT -n kube-notary ../../helm/kube-notary --wait
+helm install --kubeconfig $KUBECONFIG --kube-context $CONTEXT \
+    -n kube-notary ../../helm/kube-notary \
+    --set image.repository=kube-notary --set image.tag=test \
+    --set image.pullPolicy=Never \
+    --wait
 
 
 # Tests
