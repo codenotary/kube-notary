@@ -19,7 +19,7 @@ service:
 
 image:
   repository: codenotary/kube-notary
-  tag: dev
+  tag: latest
   pullPolicy: Always
 
 imagePullSecrets: []

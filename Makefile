@@ -4,7 +4,7 @@ GO ?= go
 DOCKER ?= docker
 HELM ?= helm
 
-REGISTRY_IMAGE="codenotary/kube-notary:dev"
+REGISTRY_IMAGE="codenotary/kube-notary:latest"
 TEST_FLAGS ?= -v -race
 
 export GO111MODULE=on
