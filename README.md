@@ -1,6 +1,8 @@
 # kube-notary
 > A Kubernetes watchdog for verifying image trust with CodeNotary.
 
+![alt text](https://raw.githubusercontent.com/vchain-us/kube-notary/master/docs/images/info.png "CodeNotary for Kubernetes")
+
 ## How it works
 
 **kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [CodeNotary](https://codenotary.io). 
@@ -12,6 +14,8 @@ For each of the running containers in each pod, `kube-notary` resolves the `Imag
 Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [grafana dashboard](grafana). 
 
 Images you trust can be signed by using the CodeNotary [vcn](https://github.com/vchain-us/vcn) CLI tool.
+
+https://infograph.venngage.com/ps/ex4ECrROPCQ/codenotary-for-kubernetes
 
 
 ## Install
