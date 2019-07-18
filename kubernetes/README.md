@@ -6,6 +6,7 @@ Before proceeding, make sure your local config is pointing to the context you wa
 ## Cluster-wide
 
 Edit files within [kube-notary/templates](kube-notary/templates) accordingly to your needs, then:
+> If you are not using the `default` namespace, please edit `namespace: default` in `kube-notary/templates/rolebinding.yaml` accordingly.
 
 ```
  kubectl apply \
