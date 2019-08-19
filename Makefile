@@ -12,6 +12,8 @@ export GO111MODULE=on
 
 .PHONY: kube-notary
 kube-notary:
+	$(GO) get github.com/rakyll/statik
+	GOOS=linux GOARCH=amd64 $(GO) generate ./pkg/status
 	GOOS=linux GOARCH=amd64 $(GO) build ./cmd/kube-notary
 
 .PHONY: image

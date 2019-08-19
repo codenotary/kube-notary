@@ -15,6 +15,7 @@ import (
 
 	"github.com/vchain-us/kube-notary/pkg/config"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
+	"github.com/vchain-us/kube-notary/pkg/status"
 	"github.com/vchain-us/kube-notary/pkg/watcher"
 
 	"k8s.io/client-go/kubernetes"
@@ -64,6 +65,9 @@ func main() {
 	// The w.ResultsHandler provides a handler to expose detailed
 	// verification results.
 	http.Handle("/results", w.ResultsHandler())
+
+	// The status.Handler() provides a handler to expose embedded the status web page.
+	http.Handle("/status/", status.Handler())
 
 	// Healthcheck endpoint.
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
