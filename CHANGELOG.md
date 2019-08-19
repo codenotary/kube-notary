@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file. This projec
 ## [Unreleased]
 
 
+<a name="v0.2.0"></a>
+## [v0.2.0] - 2019-08-19
+### Bug Fixes
+- use local image for e2e testing
+
+### Changes
+- update helm chart
+
+### Features
+- embedded status page
+
+
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2019-07-02
 ### Bug Fixes
@@ -55,4 +67,5 @@ All notable changes to this project will be documented in this file. This projec
 - vcn integration
 
 
-[Unreleased]: https://github.com/vchain-us/kube-notary/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/vchain-us/kube-notary/compare/v0.2.0...HEAD
+[v0.2.0]: https://github.com/vchain-us/kube-notary/compare/v0.1.0...v0.2.0
