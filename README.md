@@ -58,7 +58,7 @@ helm delete --purge kube-notary
 
 Examples:
 ```
- # Metrics endpoint
+  # Metrics endpoint
   export SERVICE_NAME=service/$(kubectl get service --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
   echo "Check the metrics endpoint at http://127.0.0.1:9581/metrics"
   kubectl port-forward --namespace default $SERVICE_NAME 9581
@@ -77,6 +77,17 @@ Examples:
   kubectl exec --namespace default -t $POD_NAME sh /bin/bulk_sign > vcn_bulk_sign.sh
   chmod +x vcn_bulk_sign.sh && ./vcn_bulk_sign.sh
 ```
+### Status page
+
+`kube-notary` provides an embedded status page with details of running containers and verifications. Once `kube-notary` is up and running the page is available at `http://$SERVICE_ADDRESS:9581/status/` (the service address depends on your installation). If you installed it by using the provided helm chart, the easiest way to get the status page URL is:
+
+```
+  # Status page
+  export SERVICE_NAME=service/$(kubectl get service --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
+  echo "Status page at http://127.0.0.1:9581/status/"
+  kubectl port-forward --namespace default $SERVICE_NAME 9581
+``` 
+
 ### Metrics
 
 If a Prometheus installation is running within your cluster, metrics provided by `kube-notary` will be automatically discovered. 
