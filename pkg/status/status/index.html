@@ -4,6 +4,13 @@
     <link rel="stylesheet" href="./material.min.css">
     <script src="./material.min.js"></script>
     <script src="./Chart.js"></script>
+    <style>
+        .logo {
+            width: 175px;
+            margin-left: -50px;
+            margin-right: 25px;
+        }
+    </style>
 </head>
 
 <body>
@@ -12,13 +19,15 @@
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
         <header class="mdl-layout__header">
             <div class="mdl-layout__header-row">
+                <img src="cn-color.eeadbabe.svg" class="logo">
                 <!-- Title -->
                 <span class="mdl-layout-title">kube-notary status</span>
                 <!-- Add spacer, to align navigation to the right -->
                 <div class="mdl-layout-spacer"></div>
                 <!-- Navigation. We hide it in small screens. -->
                 <nav class="mdl-navigation mdl-layout--large-screen-only">
-                    <a class="mdl-navigation__link" href="">Refresh</a>
+                    <a class="mdl-navigation__link" href="https://dashboard.codenotary.io" target="_blank">Go to dashboard.codenotary.io</a>
+                    <a class="mdl-navigation__link" href=""><b>Refresh</b></a>
                 </nav>
             </div>
         </header>
