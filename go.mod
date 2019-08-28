@@ -11,7 +11,7 @@ require (
 	github.com/btcsuite/btcd v0.0.0-20190629003639-c26ffa870fd8 // indirect
 	github.com/ethereum/go-ethereum v1.8.27 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/google/go-containerregistry v0.0.0-20190531175139-2687bd5ba651
+	github.com/google/go-containerregistry v0.0.0-20190828024420-cba75e9e5208
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.9.3 // indirect
 	github.com/karalabe/hid v1.0.0 // indirect

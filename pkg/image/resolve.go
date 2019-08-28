@@ -38,6 +38,9 @@ func image(imageRef string, keychain authn.Keychain) (containerregistry.Image, e
 func configDigest(imageRef string, keychain authn.Keychain) (string, error) {
 	img, err := image(imageRef, keychain)
 	if err != nil {
+		if _, ok := err.(*remote.ErrSchema1); ok {
+			return "", fmt.Errorf("image manifest v2 schema 1 is deprecated: %s", imageRef)
+		}
 		return "", fmt.Errorf("reading image %s: %v", imageRef, err)
 	}
 
@@ -69,7 +72,8 @@ func configDigest(imageRef string, keychain authn.Keychain) (string, error) {
 //
 // Note:
 //  - only sha256 digests are supported
-//  - Docker Manifest v1 is not yet supported, see:
+//  - Docker Manifest v2 Schema 1 is deprecated and not supported anymore, see:
+//  - https://docs.docker.com/engine/deprecated/#pushing-and-pulling-with-image-manifest-v2-schema-1
 //    https://github.com/google/go-containerregistry/blob/master/pkg/v1/remote/descriptor.go#L111
 //    https://github.com/google/go-containerregistry/issues/377
 func Resolve(imageID string, keychain authn.Keychain) (string, error) {

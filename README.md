@@ -183,6 +183,12 @@ First, Prometheus and Grafana need to be installed in your cluster.
 
 Then it's easy to [create alerts](grafana#creating-alerts) using the provided [Grafana dashboard](grafana)
 
+### Why my image cannot be signed? (manifest v2 schema 1)
+
+The image manifest v2 schema 1 format is [deprecated](https://docs.docker.com/engine/deprecated/#pushing-and-pulling-with-image-manifest-v2-schema-1) in favor of the v2 schema 2 format.
+
+Please, move to v2 schema 2 as soon as possible. Usually, you can fix that simply by pushing your image again on the registry.
+
 ### Cannot create resource "clusterrolebindings"
 
 Recent versions of Kubernetes employ a [role-based access control](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) (or RBAC) system to drive authorization decisions. It might be possible that your account does not have enough privileges to create the `ClusterRole` needed to get cluster-wide access.
