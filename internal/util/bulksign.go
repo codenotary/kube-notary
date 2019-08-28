@@ -18,20 +18,20 @@ echo
 echo
 
 export KEYSTORE_PASSWORD=$passphrase
-
-# To use a different signing key, please uncomment the following line (require vcn v0.5.1 or above)
-#export VCN_KEY=<key>
+export VCN_NOTARIZATION_PASSWORD=$passphrase
 
 # Bulk sign
 echo Signing...
 echo
 
 {{ range .Results -}}
+{{ if .Hash -}}
 vcn s --hash {{ .Hash }} --name "{{ if not .Containers -}}
 		sha256:{{ .Hash }}
 	{{- else -}}
 		{{ with index .Containers 0 }}{{ .Image }}{{ end }}
 	{{- end}}"
+{{- end}}
 {{ end }}
 `
 
