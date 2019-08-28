@@ -5,7 +5,7 @@
  * https://www.gnu.org/licenses/gpl-3.0.en.html
  *
  */
-//go:generate statik -src=./status
+//go:generate statik -f -src=./status
 package status
 
 import (
