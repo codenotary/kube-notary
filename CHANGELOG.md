@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. This projec
 ## [Unreleased]
 
 
+<a name="v0.2.1"></a>
+## [v0.2.1] - 2019-08-28
+### Bug Fixes
+- use -f to overwrite static file
+- skip not addressable images by bulk signing
+
+### Changes
+- detect deprecated manifest v2 schema 1 (closes [#2](https://github.com/vchain-us/kube-notary/issues/2))
+- **status page:** add logo and link to the dashboard (closes [#7](https://github.com/vchain-us/kube-notary/issues/7))
+
+
 <a name="v0.2.0"></a>
 ## [v0.2.0] - 2019-08-19
 ### Bug Fixes
@@ -67,5 +78,6 @@ All notable changes to this project will be documented in this file. This projec
 - vcn integration
 
 
-[Unreleased]: https://github.com/vchain-us/kube-notary/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/vchain-us/kube-notary/compare/v0.2.1...HEAD
+[v0.2.1]: https://github.com/vchain-us/kube-notary/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/vchain-us/kube-notary/compare/v0.1.0...v0.2.0
