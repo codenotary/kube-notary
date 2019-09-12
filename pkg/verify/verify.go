@@ -27,5 +27,6 @@ func getVerification(digest string, o *options) (hash string, verification *api.
 	} else {
 		verification, err = api.BlockChainVerify(hash)
 	}
+	api.TrackVerify(nil, hash, digest)
 	return
 }
