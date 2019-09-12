@@ -4,8 +4,14 @@ All notable changes to this project will be documented in this file. This projec
 ## [Unreleased]
 
 
+<a name="v0.2.2"></a>
+## [v0.2.2] - 2019-09-12
+### Changes
+- add explicit event tracking call
+
+
 <a name="v0.2.1"></a>
-## [v0.2.1] - 2019-08-28
+## [v0.2.1] - 2019-08-30
 ### Bug Fixes
 - use -f to overwrite static file
 - skip not addressable images by bulk signing
@@ -78,6 +84,7 @@ All notable changes to this project will be documented in this file. This projec
 - vcn integration
 
 
-[Unreleased]: https://github.com/vchain-us/kube-notary/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/vchain-us/kube-notary/compare/v0.2.2...HEAD
+[v0.2.2]: https://github.com/vchain-us/kube-notary/compare/v0.2.1...v0.2.2
 [v0.2.1]: https://github.com/vchain-us/kube-notary/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/vchain-us/kube-notary/compare/v0.1.0...v0.2.0
