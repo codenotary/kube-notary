@@ -14,9 +14,9 @@ jobs:
     
     steps:
     - name: Copy to
-      uses: leogr/copyto-action@v0.2.0
+      uses: leogr/copyto-action@v0.2.1
       env:
         DST_REPO: vchain-us/docs
-        DST_PATH: site/integrations/kube-notary
+        DST_PATH: site/integrations/kube-notary.md
         SRC_PATH: README.md
         GH_PAT: ${{ secrets.GH_PAT }}
