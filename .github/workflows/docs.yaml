@@ -1,0 +1,22 @@
+name: Docs
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'README.md'
+    - 'docs/**'
+
+jobs:
+  copyto:
+    name: Copy docs
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Copy to
+      uses: leogr/copyto-action@v0.2.0
+      env:
+        DST_REPO: vchain-us/docs
+        DST_PATH: site/integrations/kube-notary
+        SRC_PATH: README.md
+        GH_PAT: ${{ secrets.GH_PAT }}
