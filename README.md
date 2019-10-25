@@ -165,7 +165,7 @@ In general, verifying an image just before its execution is not enough because t
 You can easily sign your container's images by using the [vcn CLI](https://github.com/vchain-us/vcn) we provide separately.
 
 `vcn` supports local Docker installations out of the box using `docker://` prefix, followed by the image name or image reference. 
-You just have to pull the image you want to sign, then finally run `vcn sign`. Detailed instructions can be found [here](https://github.com/vchain-us/vcn/blob/master/docs/DOCKERINTEGRATION.md).
+You just have to pull the image you want to sign, then finally run `vcn sign`. Detailed instructions can be found [here](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/schemes/docker.md).
 
 Furthermore, if you want to bulk sign all images running inside your cluster, you will find below instructions to generate a script that automates the process.
 
