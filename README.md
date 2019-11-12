@@ -25,7 +25,7 @@ https://infograph.venngage.com/ps/ex4ECrROPCQ/codenotary-for-kubernetes
 First, make sure your local config is pointing to the context you want to use (ie. check `kubectl config current-context`).
 Then, to install `kube-notary`:
 
-* Clone this repository locally.
+* Clone this repository locally: https://github.com/vchain-us/kube-notary
 * Change directory into `kube-notary`.
 * Finally run:
 ```
