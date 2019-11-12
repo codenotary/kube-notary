@@ -4,7 +4,7 @@
 # https://www.gnu.org/licenses/gpl-3.0.en.html
 
 FROM docker
-RUN sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories && apk upgrade --update-cache --available
+RUN apk upgrade --update-cache --available
 RUN apk add git openssl curl
 RUN curl -Lo /usr/local/bin/kubectl \
     https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
