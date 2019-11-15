@@ -110,7 +110,7 @@
             for (var i = 0; i < data.length; i++) {
                 var item = data[i]
                 var n = item.containers ? item.containers.length : 0
-                var status = item.verification ? item.verification.status : 0
+                var status = item.verification ? item.verification.status : 2
                 var level = item.verification ? item.verification.level : 0
 
                 statusCount[status] += n
@@ -124,7 +124,7 @@
                 for (var j = 0; j < n; j++) {
                     var c = item.containers[j]
                     c.hash = item.hash
-                    c.verification = item.verification || {}
+                    c.verification = item.verification || {status: status, level: level}
                     containers.push(c)
                 }
             }
@@ -158,7 +158,7 @@
             ]
 
             function printStatus(status) {
-                return "<span class=\"mdl-chip\" style=\"background-color: " + s[status].color + ";\"><span class=\"mdl-chip__text\">" + s[status].label + "</span></span>"
+                return "<span class=\"mdl-chip\" style=\"background-color: " + s[status || 2].color + ";\"><span class=\"mdl-chip__text\">" + s[status].label + "</span></span>"
             }
 
             var l = [
@@ -170,7 +170,7 @@
             ]
 
             function printLevel(level) {
-                return "<span class=\"mdl-chip\" style=\"background-color: " + l[level].color + ";\"><span class=\"mdl-chip__text\">" + l[level].label + "</span></span>"
+                return "<span class=\"mdl-chip\" style=\"background-color: " + l[level || 0].color + ";\"><span class=\"mdl-chip__text\">" + l[level].label + "</span></span>"
             }
 
             for (var i = 0; i < data.length; i++) {
