@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. This projec
 ## [Unreleased]
 
 
+<a name="v0.2.3"></a>
+## [v0.2.3] - 2019-12-17
+### Changes
+- bump alpine version to 3.9.4
+- **ci:** trigger copy
+- **ci:** correct doc destination path
+- **ci:** trigger copy
+- **ci:** trigger copy
+- **ci:** setup docs copy action
+
+
 <a name="v0.2.2"></a>
 ## [v0.2.2] - 2019-09-12
 ### Changes
@@ -84,7 +95,8 @@ All notable changes to this project will be documented in this file. This projec
 - vcn integration
 
 
-[Unreleased]: https://github.com/vchain-us/kube-notary/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/vchain-us/kube-notary/compare/v0.2.3...HEAD
+[v0.2.3]: https://github.com/vchain-us/kube-notary/compare/v0.2.2...v0.2.3
 [v0.2.2]: https://github.com/vchain-us/kube-notary/compare/v0.2.1...v0.2.2
 [v0.2.1]: https://github.com/vchain-us/kube-notary/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/vchain-us/kube-notary/compare/v0.1.0...v0.2.0
