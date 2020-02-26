@@ -13134,7 +13134,7 @@
                 break;
             case 'auto':
             default:
-                timestamps = generate(me, min, max, me.getLabelCapacity(min), options);
+                timestamps = generate(me, min, max, me.getLabelCapacity(min));
             }
     
             if (options.bounds === 'ticks' && timestamps.length) {
@@ -14532,7 +14532,7 @@
     core_controller.helpers = helpers$1;
     
     // @todo dispatch these helpers into appropriated helpers/helpers.* file and write unit tests!
-    core_helpers(core_controller);
+    core_helpers();
     
     core_controller._adapters = core_adapters;
     core_controller.Animation = core_animation;

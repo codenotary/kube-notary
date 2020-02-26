@@ -1,5 +1,5 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <link rel="stylesheet" href="./material.min.css">
     <script src="./material.min.js"></script>
@@ -11,238 +11,239 @@
             margin-right: 25px;
         }
     </style>
+    <title>kube-notary</title>
+    <meta content="text/html; charset=utf-8" />
 </head>
-
 <body>
 
-    <!-- Always shows a header, even in smaller screens. -->
-    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-        <header class="mdl-layout__header">
-            <div class="mdl-layout__header-row">
-                <img src="cn-color.eeadbabe.svg" class="logo">
-                <!-- Title -->
-                <span class="mdl-layout-title">kube-notary status</span>
-                <!-- Add spacer, to align navigation to the right -->
-                <div class="mdl-layout-spacer"></div>
-                <!-- Navigation. We hide it in small screens. -->
-                <nav class="mdl-navigation mdl-layout--large-screen-only">
-                    <a class="mdl-navigation__link" href="https://dashboard.codenotary.io" target="_blank">Go to dashboard.codenotary.io</a>
-                    <a class="mdl-navigation__link" href=""><b>Refresh</b></a>
-                </nav>
-            </div>
-        </header>
-        <main class="mdl-layout__content">
-            <div class="page-content">
+<!-- Always shows a header, even in smaller screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <img alt="kube-notary" src="cn-color.eeadbabe.svg" class="logo">
+            <!-- Title -->
+            <span class="mdl-layout-title">kube-notary status</span>
+            <!-- Add spacer, to align navigation to the right -->
+            <div class="mdl-layout-spacer"></div>
+            <!-- Navigation. We hide it in small screens. -->
+            <nav class="mdl-navigation mdl-layout--large-screen-only">
+                <a class="mdl-navigation__link" href="https://dashboard.codenotary.io" target="_blank" rel="noopener noreferrer">Go to dashboard.codenotary.io</a>
+                <a class="mdl-navigation__link" href=""><strong>Refresh</strong></a>
+            </nav>
+        </div>
+    </header>
+    <main class="mdl-layout__content">
+        <div class="page-content">
 
-                <div class="mdl-grid">
-                    <div class="mdl-cell mdl-cell--2-col">
-                        <h4>Containers</h4>
-                        <hr>
-                        <br>
-                        <span class="mdl-chip mdl-chip--contact">
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--2-col">
+                    <h4>Containers</h4>
+                    <hr>
+                    <br>
+                    <span class="mdl-chip mdl-chip--contact">
                             <span id="c_total" class="mdl-chip__contact mdl-color--black mdl-color-text--white"></span>
                             <span class="mdl-chip__text">Containers</span>
                         </span>
-                        <br><br>
-                        <span class="mdl-chip mdl-chip--contact">
+                    <br><br>
+                    <span class="mdl-chip mdl-chip--contact">
                             <span id="c_verifiable"
-                                class="mdl-chip__contact mdl-color--teal mdl-color-text--white"></span>
+                                  class="mdl-chip__contact mdl-color--teal mdl-color-text--white"></span>
                             <span class="mdl-chip__text">Verifiable</span>
                         </span>
-                        <br><br>
-                        <span class="mdl-chip mdl-chip--contact">
+                    <br><br>
+                    <span class="mdl-chip mdl-chip--contact">
                             <span id="c_notVerifiable"
-                                class="mdl-chip__contact mdl-color--red mdl-color-text--white"></span>
+                                  class="mdl-chip__contact mdl-color--red mdl-color-text--white"></span>
                             <span class="mdl-chip__text">Not Verifiable</span>
                         </span>
-                    </div>
-                    <div class="mdl-cell mdl-cell--10-col">
-                        <h4>Container Overview</h4>
-                        <hr>
-                        <canvas id="statusChart" height="75%"></canvas>
-                    </div>
                 </div>
-                <div class="mdl-grid">
-                    <div class="mdl-cell mdl-cell--12-col">
-                        <h4>Results</h4>
-                        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" style="width: 100%">
-                            <thead>
-                                <tr>
-                                    <th class="mdl-data-table__cell--non-numeric">Namespace</th>
-                                    <th class="mdl-data-table__cell--non-numeric">Pod</th>
-                                    <th class="mdl-data-table__cell--non-numeric">Container</th>
-                                    <th class="mdl-data-table__cell--non-numeric">Image</th>
-                                    <th class="mdl-data-table__cell--non-numeric">Status</th>
-                                    <th class="mdl-data-table__cell--non-numeric">Level</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="mdl-cell mdl-cell--10-col">
+                    <h4>Container Overview</h4>
+                    <hr>
+                    <canvas id="statusChart" height="75%"></canvas>
                 </div>
-
             </div>
-        </main>
-    </div>
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h4>Results</h4>
+                    <table aria-describedby="resume" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="mdl-data-table__cell--non-numeric">Namespace</th>
+                            <th scope="col" class="mdl-data-table__cell--non-numeric">Pod</th>
+                            <th scope="col" class="mdl-data-table__cell--non-numeric">Container</th>
+                            <th scope="col" class="mdl-data-table__cell--non-numeric">Image</th>
+                            <th scope="col" class="mdl-data-table__cell--non-numeric">Status</th>
+                            <th scope="col" class="mdl-data-table__cell--non-numeric">Level</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-    <script>
+        </div>
+    </main>
+</div>
 
-        var xhttp = new XMLHttpRequest
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                run(JSON.parse(this.responseText))
-            }
-        };
-        xhttp.open("GET", "../results", true);
-        xhttp.send();
+<script>
 
-        function run(data) {
-            var statusCount = [0, 0, 0, 0]
-            var counters = {
-                total: 0,
-                verifiable: 0,
-                notVerifiable: 0,
-            }
+    var xhttp = new XMLHttpRequest
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            run(JSON.parse(this.responseText))
+        }
+    };
+    xhttp.open("GET", "../results", true);
+    xhttp.send();
 
-            var containers = []
-
-            for (var i = 0; i < data.length; i++) {
-                var item = data[i]
-                var n = item.containers ? item.containers.length : 0
-                var status = item.verification ? item.verification.status : 2
-                var level = item.verification ? item.verification.level : 0
-
-                statusCount[status] += n
-                counters.total += n
-                if (level > 0) {
-                    counters.verifiable += n
-                } else {
-                    counters.notVerifiable += n
-                }
-
-                for (var j = 0; j < n; j++) {
-                    var c = item.containers[j]
-                    c.hash = item.hash
-                    c.verification = item.verification || {status: status, level: level}
-                    containers.push(c)
-                }
-            }
-
-            updateCounters(counters)
-            drawChart(
-                ['Trusted ', 'Unknown', 'Untrusted', 'Unsupported'],
-                [statusCount[0], statusCount[2], statusCount[1], statusCount[3]]
-            )
-            populateTable(containers)
+    function run(data) {
+        var statusCount = [0, 0, 0, 0]
+        var counters = {
+            total: 0,
+            verifiable: 0,
+            notVerifiable: 0,
         }
 
-        function populateTable(data) {
-            console.log(data)
-            var tBody = document.getElementById('tableBody')
+        var containers = []
 
-            function appendTd(parent, content, klass) {
-                var td = document.createElement("td")
-                td.innerHTML = content
-                if (klass) {
-                    td.classList.add(klass)
-                }
-                parent.appendChild(td)
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i]
+            var n = item.containers ? item.containers.length : 0
+            var status = item.verification ? item.verification.status : 2
+            var level = item.verification ? item.verification.level : 0
+
+            statusCount[status] += n
+            counters.total += n
+            if (level > 0) {
+                counters.verifiable += n
+            } else {
+                counters.notVerifiable += n
             }
 
-            var s = [
-                { label: 'Trusted', color: 'rgba(50, 172, 45, .7)' },
-                { label: 'Untrusted', color: 'rgba(255, 0, 0, .7)' },
-                { label: 'Unknown', color: 'rgba(199, 192, 40, .7)' },
-                { label: 'Unsupported', color: 'rgba(255, 0, 0, .7)' }
-            ]
-
-            function printStatus(status) {
-                return "<span class=\"mdl-chip\" style=\"background-color: " + s[status || 2].color + ";\"><span class=\"mdl-chip__text\">" + s[status].label + "</span></span>"
-            }
-
-            var l = [
-                { label: '', color: 'rgba(0,0,0, .0)' },
-                { label: 'Email Verified', color: 'rgba(199, 192, 40, .7)' },
-                { label: 'Social Verified', color: 'rgba(237, 129, 40, .7)' },
-                { label: 'ID Verified', color: 'rgba(50, 172, 45, .7)' },
-                { label: 'Address Verified', color: 'rgba(50, 172, 45, .7)' },
-            ]
-
-            function printLevel(level) {
-                return "<span class=\"mdl-chip\" style=\"background-color: " + l[level || 0].color + ";\"><span class=\"mdl-chip__text\">" + l[level].label + "</span></span>"
-            }
-
-            for (var i = 0; i < data.length; i++) {
-                var c = data[i]
-
-                var tr = document.createElement("tr")
-                tr.id = "tRow" + i
-                appendTd(tr, c.namespace, "mdl-data-table__cell--non-numeric")
-                appendTd(tr, c.pod, "mdl-data-table__cell--non-numeric")
-                appendTd(tr, c.container, "mdl-data-table__cell--non-numeric")
-                appendTd(tr, c.image, "mdl-data-table__cell--non-numeric")
-                appendTd(tr, printStatus(c.verification.status), "mdl-data-table__cell--non-numeric")
-                appendTd(tr, printLevel(c.verification.level), "mdl-data-table__cell--non-numeric")
-
-                var tooltip = document.createElement("span")
-                tooltip.setAttribute("for", tr.id)
-                tooltip.classList.add("mdl-tooltip")
-                tooltip.style.maxWidth = "none"
-                tooltip.style.textAlign = "left"
-                tooltip.innerHTML = "<pre>" + JSON.stringify(c, null, 2) + "</pre>"
-                tr.appendChild(tooltip)
-
-                tBody.appendChild(tr)
+            for (var j = 0; j < n; j++) {
+                var c = item.containers[j]
+                c.hash = item.hash
+                c.verification = item.verification || {status: status, level: level}
+                containers.push(c)
             }
         }
 
-        function updateCounters(counters) {
-            for (var k in counters) {
-                var el = document.getElementById("c_" + k)
-                if (el) {
-                    el.innerHTML = counters[k]
-                }
+        updateCounters(counters)
+        drawChart(
+            ['Trusted ', 'Unknown', 'Untrusted', 'Unsupported'],
+            [statusCount[0], statusCount[2], statusCount[1], statusCount[3]]
+        )
+        populateTable(containers)
+    }
+
+    function populateTable(data) {
+        console.log(data)
+        var tBody = document.getElementById('tableBody')
+
+        function appendTd(parent, content, klass) {
+            var td = document.createElement("td")
+            td.innerHTML = content
+            if (klass) {
+                td.classList.add(klass)
             }
+            parent.appendChild(td)
         }
 
-        function drawChart(labels, data) {
-            var ctx = document.getElementById('statusChart').getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '# of Containers',
-                        data: data,
-                        backgroundColor: [
-                            'rgba(120,164,107, .2)',
-                            'rgba(199, 192, 40, .2)',
-                            'rgba(255, 0, 0, .2)',
-                            'rgba(255, 0, 0, .2)',
-                        ],
-                        borderColor: [
-                            'rgba(120,164,107, 1)',
-                            'rgba(199, 192, 40, 1)',
-                            'rgba(255, 0, 0, 1)',
-                            'rgba(255, 0, 0, 1)',
-                        ],
-                        borderWidth: 1
+        var s = [
+            { label: 'Trusted', color: 'rgba(50, 172, 45, .7)' },
+            { label: 'Untrusted', color: 'rgba(255, 0, 0, .7)' },
+            { label: 'Unknown', color: 'rgba(199, 192, 40, .7)' },
+            { label: 'Unsupported', color: 'rgba(255, 0, 0, .7)' }
+        ]
+
+        function printStatus(status) {
+            return "<span class=\"mdl-chip\" style=\"background-color: " + s[status || 2].color + ";\"><span class=\"mdl-chip__text\">" + s[status].label + "</span></span>"
+        }
+
+        var l = [
+            { label: '', color: 'rgba(0,0,0, .0)' },
+            { label: 'Email Verified', color: 'rgba(199, 192, 40, .7)' },
+            { label: 'Social Verified', color: 'rgba(237, 129, 40, .7)' },
+            { label: 'ID Verified', color: 'rgba(50, 172, 45, .7)' },
+            { label: 'Address Verified', color: 'rgba(50, 172, 45, .7)' },
+        ]
+
+        function printLevel(level) {
+            return "<span class=\"mdl-chip\" style=\"background-color: " + l[level || 0].color + ";\"><span class=\"mdl-chip__text\">" + l[level].label + "</span></span>"
+        }
+
+        for (var i = 0; i < data.length; i++) {
+            var c = data[i]
+
+            var tr = document.createElement("tr")
+            tr.id = "tRow" + i
+            appendTd(tr, c.namespace, "mdl-data-table__cell--non-numeric")
+            appendTd(tr, c.pod, "mdl-data-table__cell--non-numeric")
+            appendTd(tr, c.container, "mdl-data-table__cell--non-numeric")
+            appendTd(tr, c.image, "mdl-data-table__cell--non-numeric")
+            appendTd(tr, printStatus(c.verification.status), "mdl-data-table__cell--non-numeric")
+            appendTd(tr, printLevel(c.verification.level), "mdl-data-table__cell--non-numeric")
+
+            var tooltip = document.createElement("span")
+            tooltip.setAttribute("for", tr.id)
+            tooltip.classList.add("mdl-tooltip")
+            tooltip.style.maxWidth = "none"
+            tooltip.style.textAlign = "left"
+            tooltip.innerHTML = "<pre>" + JSON.stringify(c, null, 2) + "</pre>"
+            tr.appendChild(tooltip)
+
+            tBody.appendChild(tr)
+        }
+    }
+
+    function updateCounters(counters) {
+        for (var k in counters) {
+            var el = document.getElementById("c_" + k)
+            if (el) {
+                el.innerHTML = counters[k]
+            }
+        }
+    }
+
+    function drawChart(labels, data) {
+        var ctx = document.getElementById('statusChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '# of Containers',
+                    data: data,
+                    backgroundColor: [
+                        'rgba(120,164,107, .2)',
+                        'rgba(199, 192, 40, .2)',
+                        'rgba(255, 0, 0, .2)',
+                        'rgba(255, 0, 0, .2)',
+                    ],
+                    borderColor: [
+                        'rgba(120,164,107, 1)',
+                        'rgba(199, 192, 40, 1)',
+                        'rgba(255, 0, 0, 1)',
+                        'rgba(255, 0, 0, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
                     }]
-                },
-                options: {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    }
                 }
-            });
-        }
+            }
+        });
+    }
 
-    </script>
+</script>
 </body>
 
 </html>
