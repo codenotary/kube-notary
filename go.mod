@@ -24,7 +24,7 @@ require (
 	github.com/prometheus/client_golang v1.0.0
 	github.com/prometheus/common v0.6.0 // indirect
 	github.com/prometheus/procfs v0.0.3 // indirect
-	github.com/rakyll/statik v0.1.6
+	github.com/rakyll/statik v0.1.7
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.4.0

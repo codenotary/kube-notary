@@ -30,7 +30,11 @@ spec:
             name: {{ include "kube-notary.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
+          {{- if .Values.debug }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- else}}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
           - name: config-volume
@@ -39,6 +43,15 @@ spec:
           - containerPort: 9581
             name: metrics-port
             protocol: TCP
+          {{- if .Values.debug }}
+          - containerPort: 40000
+            name: debug-port
+            protocol: TCP
+          securityContext:
+            capabilities:
+              add:
+                - SYS_PTRACE
+          {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz
