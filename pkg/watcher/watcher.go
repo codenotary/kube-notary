@@ -95,6 +95,8 @@ func (w *watchdog) Run() {
 			opt = verify.WithSignerKeys(keys...)
 		}
 
+		w.rec.Reset()
+
 		pods, err := clientset.CoreV1().Pods(ns).List(metav1.ListOptions{})
 		if err != nil {
 			fields["error"] = true
