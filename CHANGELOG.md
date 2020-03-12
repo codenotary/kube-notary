@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file. This projec
 ## [Unreleased]
 
 
+<a name="v0.2.5"></a>
+## [v0.2.5] - 2020-03-12
+### Bug Fixes
+- fix js useless function params
+- fix html bugs and security issues
+- **pkg/watcher:** fix pod list's not updated after remove
+
+### Changes
+- improve changelog config in order to manage packages
+- Improve makefile with kubernetes debug enviroment for golang
+
+### Features
+- **pkg/metrics:** add reset recorder
+
+
 <a name="v0.2.4"></a>
 ## [v0.2.4] - 2019-12-17
 ### Bug Fixes
@@ -12,6 +27,10 @@ All notable changes to this project will be documented in this file. This projec
 
 <a name="v0.2.3"></a>
 ## [v0.2.3] - 2019-12-17
+### Bug Fixes
+- **pkg/status:** avoid broken page when results are errored (fixes [#10](https://github.com/vchain-us/vcn/issues/10))
+- **test/e2e:** correct Dockerfile.test-e2e for latest docker image
+
 ### Changes
 - bump alpine version to 3.9.4
 - **ci:** trigger copy
@@ -34,8 +53,8 @@ All notable changes to this project will be documented in this file. This projec
 - skip not addressable images by bulk signing
 
 ### Changes
-- detect deprecated manifest v2 schema 1 (closes [#2](https://github.com/vchain-us/kube-notary/issues/2))
-- **status page:** add logo and link to the dashboard (closes [#7](https://github.com/vchain-us/kube-notary/issues/7))
+- detect deprecated manifest v2 schema 1 (closes [#2](https://github.com/vchain-us/vcn/issues/2))
+- **status page:** add logo and link to the dashboard (closes [#7](https://github.com/vchain-us/vcn/issues/7))
 
 
 <a name="v0.2.0"></a>
@@ -101,9 +120,10 @@ All notable changes to this project will be documented in this file. This projec
 - vcn integration
 
 
-[Unreleased]: https://github.com/vchain-us/kube-notary/compare/v0.2.4...HEAD
-[v0.2.4]: https://github.com/vchain-us/kube-notary/compare/v0.2.3...v0.2.4
-[v0.2.3]: https://github.com/vchain-us/kube-notary/compare/v0.2.2...v0.2.3
-[v0.2.2]: https://github.com/vchain-us/kube-notary/compare/v0.2.1...v0.2.2
-[v0.2.1]: https://github.com/vchain-us/kube-notary/compare/v0.2.0...v0.2.1
-[v0.2.0]: https://github.com/vchain-us/kube-notary/compare/v0.1.0...v0.2.0
+[Unreleased]: https://github.com/vchain-us/vcn/compare/v0.2.5...HEAD
+[v0.2.5]: https://github.com/vchain-us/vcn/compare/v0.2.4...v0.2.5
+[v0.2.4]: https://github.com/vchain-us/vcn/compare/v0.2.3...v0.2.4
+[v0.2.3]: https://github.com/vchain-us/vcn/compare/v0.2.2...v0.2.3
+[v0.2.2]: https://github.com/vchain-us/vcn/compare/v0.2.1...v0.2.2
+[v0.2.1]: https://github.com/vchain-us/vcn/compare/v0.2.0...v0.2.1
+[v0.2.0]: https://github.com/vchain-us/vcn/compare/v0.1.0...v0.2.0
