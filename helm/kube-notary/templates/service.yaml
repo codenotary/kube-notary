@@ -11,6 +11,12 @@ spec:
       targetPort: metrics-port
       protocol: TCP
       name: metrics-port
+    {{- if .Values.debug }}
+    - port: 40000
+      targetPort: debug-port
+      protocol: TCP
+      name: debug-port
+    {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "kube-notary.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
