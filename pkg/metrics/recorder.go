@@ -9,4 +9,5 @@ package metrics
 
 type Recorder interface {
 	Record(Metric)
+	Reset()
 }

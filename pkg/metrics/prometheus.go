@@ -67,6 +67,11 @@ func (p prometheusRecorder) Record(m Metric) {
 	verificationLevel.With(labels).Set(float64(m.Verification.Level))
 }
 
+func (p prometheusRecorder) Reset() {
+	verificationStatus.Reset()
+	verificationLevel.Reset()
+}
+
 type prometheusRecorder struct{}
 
 func NewRecorder() Recorder {
