@@ -2,7 +2,7 @@ style: github
 template: CHANGELOG.tpl.md
 info:
   title: CHANGELOG
-  repository_url: https://github.com/vchain-us/kube-notary
+  repository_url: https://github.com/vchain-us/vcn
 options:
   commits:
     filters:
@@ -20,7 +20,7 @@ options:
       refactor: Code Refactoring
       chore: Changes
   header:
-    pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
+    pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s\\/]*)\\))?\\:\\s(.*)$"
     pattern_maps:
       - Type
       - Scope
