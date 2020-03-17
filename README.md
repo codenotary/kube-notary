@@ -28,9 +28,17 @@ Then, to install `kube-notary`:
 * Clone this repository locally: https://github.com/vchain-us/kube-notary
 * Change directory into `kube-notary`.
 * Finally run:
+
+Helm v2
 ```
 helm install -n kube-notary helm/kube-notary
 ```
+
+Helm v3
+```
+helm install kube-notary helm/kube-notary -n kube-notary
+```
+
 > See the [Configuration](#Configuration) paragraph for detailed instructions.
 
 ### Namespaced
