@@ -225,6 +225,13 @@ See [#11](https://github.com/vchain-us/kube-notary/issues/11).
 ```
 make test/e2e
 ```
+## Developing 
+To launch a debug environment with kubernetes it's possible to use the make utilities with:
+```shell script
+make image/debug 
+make kubernetes/debug
+```
+It launches a kubernetes cluster with [kind](https://github.com/kubernetes-sigs/kind) . A dlv debug server is launched inside the pod and it's possible to execute a remote debugging.
 
 ## License
 

@@ -23,4 +23,4 @@ RUN echo "curl -s 127.0.0.1:9581/results?output=bulk_sign" > /bin/bulk_sign \
 COPY --from=builder /go/bin/dlv /bin/dlv
 COPY --from=builder /src/kube-notary /bin/kube-notary
 
-ENTRYPOINT ["/bin/dlv", "--listen=:40000", "--headless=true", "--continue", "--accept-multiclient", "--api-version=2", "exec", "/bin/kube-notary"]
+ENTRYPOINT ["/bin/dlv", "--listen=:40000", "--headless=true", "--continue", "--accept-multiclient", "--check-go-version=false", "--api-version=2", "exec", "/bin/kube-notary"]
