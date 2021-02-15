@@ -17,15 +17,15 @@ import (
 func getVerification(digest string, o *options) (hash string, verification *api.BlockchainVerification, err error) {
 	hash = strings.TrimPrefix(digest, "sha256:")
 	if o.org != "" {
-		bo, err := api.BlockChainGetOrganisation(o.org)
+		bo, err := api.GetBlockChainOrganisation(o.org)
 		if err != nil {
 			return hash, nil, err
 		}
-		verification, err = api.BlockChainVerifyMatchingPublicKeys(hash, bo.MembersKeys())
+		verification, err = api.VerifyMatchingSignerIDs(hash, bo.MembersIDs())
 	} else if len(o.keys) > 0 {
-		verification, err = api.BlockChainVerifyMatchingPublicKeys(hash, o.keys)
+		verification, err = api.VerifyMatchingSignerIDs(hash, o.keys)
 	} else {
-		verification, err = api.BlockChainVerify(hash)
+		verification, err = api.Verify(hash)
 	}
 	api.TrackVerify(nil, hash, digest)
 	return
