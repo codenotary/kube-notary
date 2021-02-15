@@ -9,6 +9,7 @@
 package watcher
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"sync"
@@ -97,7 +98,7 @@ func (w *watchdog) Run() {
 
 		w.rec.Reset()
 
-		pods, err := clientset.CoreV1().Pods(ns).List(metav1.ListOptions{})
+		pods, err := clientset.CoreV1().Pods(ns).List(context.Background(), metav1.ListOptions{})
 		if err != nil {
 			fields["error"] = true
 			w.log.WithFields(fields).Errorf("Error getting pods: %s", err)

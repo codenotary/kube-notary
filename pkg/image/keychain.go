@@ -8,6 +8,7 @@
 package image
 
 import (
+	"context"
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/authn/k8schain"
 	"k8s.io/client-go/kubernetes"
@@ -15,9 +16,10 @@ import (
 
 // NewKeychain returns a new authn.Keychain suitable for resolving image references as
 // scoped by the provided namespace, serviceAccountName, and imagePullSecretes.
+
 // It speaks to Kubernetes through the provided client interface.
 func NewKeychain(client kubernetes.Interface, namespace string, serviceAccountName string, imagePullSecrets []string) (authn.Keychain, error) {
-	return k8schain.New(client, k8schain.Options{
+	return k8schain.New(context.Background(), client, k8schain.Options{
 		Namespace:          namespace,
 		ServiceAccountName: serviceAccountName,
 		ImagePullSecrets:   imagePullSecrets,

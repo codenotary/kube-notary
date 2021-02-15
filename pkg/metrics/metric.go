@@ -31,7 +31,6 @@ func (m Metric) LogFields() *log.Fields {
 		"image_id":            m.ContainerStatus.ImageID,
 		"hash":                m.Hash,
 		"verification_date":   m.Verification.Date(),
-		"verification_key":    m.Verification.Key(),
 		"verification_level":  m.Verification.Level,
 		"verification_status": m.Verification.Status,
 		"trusted":             m.Verification.Trusted(),
