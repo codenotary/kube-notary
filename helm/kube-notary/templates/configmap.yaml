@@ -8,12 +8,18 @@ data:
   config.yaml: |-
     log:
       level: {{ .Values.log.level }}
-    watch: 
+    watch:
       namespace: {{ .Values.watch.namespace }}
       interval: {{ .Values.watch.interval }}
-    trust: 
+    trust:
       org: {{ .Values.trust.org }}
       keys:
         {{- range .Values.trust.keys }}
         - {{ . | quote }}
         {{- end }}
+    cnlc:
+      host: {{ .Values.cnlc.host }}
+      port: {{ .Values.cnlc.port }}
+      cert: {{ .Values.cnlc.cert }}
+      noTls: {{ .Values.cnlc.noTls }}
+      skipTlsVerify: {{ .Values.cnlc.skipTlsVerify }}

@@ -14,15 +14,20 @@ import (
 
 // Configuration variables names
 const (
-	LogLevel       = "log.level"
-	WatchNamespace = "watch.namespace"
-	WatchInterval  = "watch.interval"
-	TrustKeys      = "trust.keys"
-	TrustOrg       = "trust.org"
+	LogLevel        = "log.level"
+	WatchNamespace  = "watch.namespace"
+	WatchInterval   = "watch.interval"
+	TrustKeys       = "trust.keys"
+	TrustOrg        = "trust.org"
+	LcHost          = "cnlc.host"
+	LcPort          = "cnlc.cert"
+	LcCert          = "cnlc.port"
+	LcNoTls         = "cnlc.noTls"
+	LcSkipTlsVerify = "cnlc.skipTlsVerify"
 )
 
 const (
-	defaultConfigPath = "/etc/kube-notary/config.yaml"
+	defaultConfigPath = "/etc/kube-notary/config.yaml" // defined with mountPath in deployment.yaml by kubernetes
 )
 
 // Interface is the kube-notary configuration
@@ -32,6 +37,11 @@ type Interface interface {
 	Interval() time.Duration
 	TrustedKeys() []string
 	TrustedOrg() string
+	LcHost() string
+	LcPort() string
+	LcCert() string
+	LcSkipTlsVerify() bool
+	LcNoTls() bool
 }
 
 type cfg struct {
@@ -51,6 +61,8 @@ func New() (Interface, error) {
 	v.SetDefault(WatchInterval, time.Second*60)
 	v.SetDefault(TrustKeys, nil)
 	v.SetDefault(TrustOrg, "")
+	v.SetDefault(LcHost, "127.0.0.1")
+	v.SetDefault(LcPort, "3325")
 
 	// Setup
 	v.AutomaticEnv()
@@ -102,4 +114,29 @@ func (c cfg) TrustedKeys() []string {
 // TrustedOrg returns the trusted organization ID as string
 func (c cfg) TrustedOrg() string {
 	return c.v.GetString(TrustOrg)
+}
+
+// LcHost returns CNLC connection host as a string
+func (c cfg) LcHost() string {
+	return c.v.GetString(LcHost)
+}
+
+// LcCert returns CNLC connection port as a string
+func (c cfg) LcPort() string {
+	return c.v.GetString(LcPort)
+}
+
+// LcCert returns CNLC connection certificate as a string
+func (c cfg) LcCert() string {
+	return c.v.GetString(LcCert)
+}
+
+// LcSkipTlsVerify returns the CNLC LcSkipTlsVerify connection property as a bool
+func (c cfg) LcSkipTlsVerify() bool {
+	return c.v.GetBool(LcSkipTlsVerify)
+}
+
+// LcNoTls returns the CNLC no tls connection property as a bool
+func (c cfg) LcNoTls() bool {
+	return c.v.GetBool(LcNoTls)
 }
