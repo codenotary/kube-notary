@@ -5,12 +5,19 @@
 # Runtime config
 log:
   level: debug
-watch: 
+watch:
   namespace: ""
   interval: 60s
 trust:
   org: ""
   keys: []
+
+cnlc:
+  host: 127.0.0.1
+  port: 3324
+  cert:
+  noTls: true
+  skipTlsVerify: false
 
 # Installation config
 service:

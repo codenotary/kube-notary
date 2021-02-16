@@ -39,6 +39,9 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /etc/kube-notary
+          envFrom:
+            - configMapRef:
+                name: {{ include "kube-notary.fullname" . }}-cncl
           ports:
           - containerPort: 9581
             name: metrics-port

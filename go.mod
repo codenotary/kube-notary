@@ -86,7 +86,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca // indirect
 	github.com/tyler-smith/go-bip39 v1.1.0 // indirect
-	github.com/vchain-us/vcn v0.9.5-0.20210211142635-16848a7c2701
+	github.com/vchain-us/vcn v0.9.5-0.20210215163048-9d79f790ee8f
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208 // indirect
 	go.etcd.io/bbolt v1.3.5 // indirect
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20200910180754-dd1b699fc489 // indirect

@@ -13,16 +13,20 @@ import (
 	"github.com/vchain-us/vcn/pkg/api"
 )
 
-// ImageID returns the hast string and the BlockchainVerification for the given imageID
-func ImageID(imageID string, options ...Option) (hash string, verification *api.BlockchainVerification, err error) {
+// ImageHash returns the hash string and the BlockchainVerification for the given imageID
+func ImageHash(imageID string, options ...Option) (hash string, err error) {
 	o, err := makeOptions(options...)
 	if err != nil {
 		return
 	}
+	return image.Resolve(imageID, o.keychain)
+}
 
-	digest, err := image.Resolve(imageID, o.keychain)
+func ImageVerify(hash string, options ...Option) (verification *api.BlockchainVerification, err error) {
+	o, err := makeOptions(options...)
 	if err != nil {
 		return
 	}
-	return getVerification(digest, o)
+	_, v, e := getVerification(hash, o)
+	return v, e
 }

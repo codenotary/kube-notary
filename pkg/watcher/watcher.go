@@ -11,6 +11,7 @@ package watcher
 import (
 	"context"
 	"fmt"
+	"github.com/vchain-us/vcn/pkg/api"
 	"net/http"
 	"sync"
 	"time"
@@ -147,10 +148,28 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			continue
 		}
 		errors := make([]error, 0)
-		hash, verification, err := verify.ImageID(
+
+		hash, err := verify.ImageHash(
 			status.ImageID,
 			opts...,
 		)
+		if err != nil {
+			errors = append(errors, err)
+			w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+		}
+
+		cippa := w.cfg.LcHost()
+		println(cippa)
+		if cippa != "" {
+			_, err := api.LcVerify(hash)
+			if err != nil {
+				errors = append(errors, err)
+				w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+			}
+			return
+		}
+
+		verification, err := verify.ImageVerify(hash, opts...)
 
 		if err != nil {
 			errors = append(errors, err)

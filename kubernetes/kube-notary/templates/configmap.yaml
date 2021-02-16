@@ -11,9 +11,15 @@ data:
   config.yaml: |-
     log:
       level: debug
-    watch: 
-      namespace: 
+    watch:
+      namespace:
       interval: 60s
-    trust: 
-      org: 
+    trust:
+      org:
       keys:
+    cnlc:
+      host: 127.0.0.1
+      port: 3324
+      cert:
+      noTls: true
+      skipTlsVerify: false
