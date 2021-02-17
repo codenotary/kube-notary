@@ -39,9 +39,12 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /etc/kube-notary
-          envFrom:
-            - configMapRef:
-                name: {{ include "kube-notary.fullname" . }}-cncl
+          env:
+            - name: VCN_LC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vcn-lc-api-key
+                  key: api-key
           ports:
           - containerPort: 9581
             name: metrics-port
