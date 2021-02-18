@@ -12,7 +12,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/vchain-us/vcn/pkg/api"
+	"github.com/vchain-us/vcn/pkg/meta"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -147,52 +149,99 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			w.log.Infof(`Container "%s" in pod "%s" is not running: skipped`, status.Name, pod.Name)
 			continue
 		}
-		errors := make([]error, 0)
+		errorList := make([]error, 0)
 
 		hash, err := verify.ImageHash(
 			status.ImageID,
 			opts...,
 		)
 		if err != nil {
-			errors = append(errors, err)
+			errorList = append(errorList, err)
 			w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
 		}
 
-		cippa := w.cfg.LcHost()
-		println(cippa)
-		if cippa != "" {
-			_, err := api.LcVerify(hash)
-			if err != nil {
-				errors = append(errors, err)
+		v := &verify.Verification{}
+
+		if w.cfg.LcHost() != "" {
+			hash = strings.TrimPrefix(hash, "sha256:")
+			ar, err := api.LcVerify(hash, w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
+			if err == api.ErrNotVerified {
+				v.Status = meta.StatusUnknown
+				v.Level = meta.LevelUnknown
+				v.Date = ""
+				v.Trusted = false
+				w.log.Errorf(`Image "%s" in pod "%s" is not verified: %s`, status.ImageID, pod.Name, err)
+			} else if api.ErrNotFound == err {
+				v.Status = meta.StatusUnknown
+				v.Level = meta.LevelUnknown
+				v.Date = ""
+				v.Trusted = false
+				w.log.Errorf(`Image "%s" in pod "%s" not found: %s`, status.ImageID, pod.Name, err)
+			} else if err != nil {
+				v.Status = meta.StatusUnknown
+				v.Level = meta.LevelUnknown
+				v.Date = ""
+				v.Trusted = false
+				errorList = append(errorList, err)
 				w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+			} else {
+				v.Status = ar.Status
+				v.Level = meta.LevelCNLC
+				v.Date = ar.Date()
+				v.Trusted = true
+				w.log.Errorf(`Image "%s" verified in pod "%s"`, status.ImageID, pod.Name)
 			}
-			return
-		}
 
-		verification, err := verify.ImageVerify(hash, opts...)
-
-		if err != nil {
-			errors = append(errors, err)
-			w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
-		} else {
 			metric := metrics.Metric{
 				Pod:             &pod,
 				ContainerStatus: &status,
-				Verification:    verification,
+				Verification:    v,
 				Hash:            hash,
 			}
-
-			fields := metric.LogFields()
-			if verification.Trusted() {
+			/*fields := metric.LogFields()
+			if verified {
 				w.log.WithFields(*fields).Info("Image is trusted")
 			} else {
 				w.log.WithFields(*fields).Warn("Image is NOT trusted")
-			}
+			}*/
 
 			w.rec.Record(metric)
+
+		} else {
+			verification, err := verify.ImageVerify(hash, opts...)
+
+			if err != nil {
+				errorList = append(errorList, err)
+				w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+			} else {
+				metric := metrics.Metric{
+					Pod:             &pod,
+					ContainerStatus: &status,
+					Hash:            hash,
+				}
+				if verification != nil {
+					v = &verify.Verification{}
+					v.Status = verification.Status
+					v.Level = verification.Level
+					v.Date = verification.Date()
+					v.Trusted = verification.Trusted()
+					metric.Verification = v
+
+					fields := metric.LogFields()
+					if verification.Trusted() {
+						w.log.WithFields(*fields).Info("Image is trusted")
+					} else {
+						w.log.WithFields(*fields).Warn("Image is NOT trusted")
+					}
+
+				}
+
+				w.rec.Record(metric)
+			}
+
 		}
 
 		// update or insert the result into tmp list
-		w.upsert(pod, status, hash, verification, errors)
+		w.upsert(pod, status, v, hash, errorList)
 	}
 }

@@ -23,6 +23,7 @@ spec:
         prometheus.io/port: '9581'
     spec:
       serviceAccountName: kube-notary
+      hostNetwork: true
       volumes:
         - name: config-volume
           configMap:

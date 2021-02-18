@@ -20,8 +20,8 @@ const (
 	TrustKeys       = "trust.keys"
 	TrustOrg        = "trust.org"
 	LcHost          = "cnlc.host"
-	LcPort          = "cnlc.cert"
-	LcCert          = "cnlc.port"
+	LcPort          = "cnlc.port"
+	LcCert          = "cnlc.cert"
 	LcNoTls         = "cnlc.noTls"
 	LcSkipTlsVerify = "cnlc.skipTlsVerify"
 )
@@ -61,8 +61,10 @@ func New() (Interface, error) {
 	v.SetDefault(WatchInterval, time.Second*60)
 	v.SetDefault(TrustKeys, nil)
 	v.SetDefault(TrustOrg, "")
-	v.SetDefault(LcHost, "127.0.0.1")
-	v.SetDefault(LcPort, "3325")
+	v.SetDefault(LcHost, "")
+	v.SetDefault(LcPort, "3324")
+	v.SetDefault(LcNoTls, true)
+	v.SetDefault(LcSkipTlsVerify, true)
 
 	// Setup
 	v.AutomaticEnv()

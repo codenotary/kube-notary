@@ -11,9 +11,9 @@ package watcher
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/vchain-us/kube-notary/pkg/verify"
 	"net/http"
 
-	vcn "github.com/vchain-us/vcn/pkg/api"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -29,10 +29,10 @@ type ContainerInfo struct {
 
 // Result represents a watcher inspection of a container
 type Result struct {
-	Hash         string                      `json:"hash"`
-	Containers   []ContainerInfo             `json:"containers"`
-	Verification *vcn.BlockchainVerification `json:"verification,omitempty"`
-	Errors       []string                    `json:"errors,omitempty"`
+	Hash         string               `json:"hash"`
+	Containers   []ContainerInfo      `json:"containers"`
+	Verification *verify.Verification `json:"verification,omitempty"`
+	Errors       []string             `json:"errors,omitempty"`
 }
 
 func (w *watchdog) commit() {
@@ -55,7 +55,7 @@ func (w *watchdog) commit() {
 	w.tmp = []string{}
 }
 
-func (w *watchdog) upsert(pod corev1.Pod, status corev1.ContainerStatus, hash string, v *vcn.BlockchainVerification, errs []error) {
+func (w *watchdog) upsert(pod corev1.Pod, status corev1.ContainerStatus, v *verify.Verification, hash string, errs []error) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 

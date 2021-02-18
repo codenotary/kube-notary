@@ -24,6 +24,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- if .Values.debug }}
+      hostNetwork: true
+    {{- end }}
       volumes:
         - name: config-volume
           configMap:
@@ -39,12 +42,14 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /etc/kube-notary
+          {{- if .Values.cnlc.host }}
           env:
             - name: VCN_LC_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: vcn-lc-api-key
                   key: api-key
+          {{- end }}
           ports:
           - containerPort: 9581
             name: metrics-port

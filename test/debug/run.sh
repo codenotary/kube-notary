@@ -25,16 +25,19 @@ kind load docker-image --name=$CLUSTER_NAME $KUBE_NOTARY_IMAGE
 kubectl  apply -f ../../test/e2e/tiller-rbac.yaml
 helm init --service-account tiller --history-max 200 --wait
 
-kubectl create secret generic vcn-lc-api-key --from-literal=api-key=epzwjbwyhevjtsjvnfqaxyjjmklzbxwqiwfq
+# Not needed in CodeNotary.io mode
+kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
 
 # Install kube-notary chart
+# Remove cnlc.host to disable Ledger Compliance mode
 helm install \
     -n kube-notary ../../helm/kube-notary \
     --set debug=true \
     --set image.repository=kube-notary --set image.tag=debug\
     --set image.pullPolicy=Never \
     --set restartPolicy=Never \
-    --set secret=bWVnYV9zZWNyZXRfa2V5 \
+    --set cnlc.host=$(hostname) \
+    --set watch.interval=10s \
     --wait
 
 export SERVICE_NAME=service/$(kubectl get service --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")

@@ -13,7 +13,7 @@ trust:
   keys: []
 
 cnlc:
-  host: 127.0.0.1
+  host:
   port: 3324
   cert:
   noTls: true
