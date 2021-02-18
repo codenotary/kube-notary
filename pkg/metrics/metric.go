@@ -8,17 +8,16 @@
 package metrics
 
 import (
-	"github.com/vchain-us/vcn/pkg/api"
-
 	log "github.com/sirupsen/logrus"
+	"github.com/vchain-us/kube-notary/pkg/verify"
 	corev1 "k8s.io/api/core/v1"
 )
 
 type Metric struct {
 	Pod             *corev1.Pod
 	ContainerStatus *corev1.ContainerStatus
-	Verification    *api.BlockchainVerification
 	Hash            string
+	Verification    *verify.Verification
 }
 
 func (m Metric) LogFields() *log.Fields {
@@ -30,9 +29,9 @@ func (m Metric) LogFields() *log.Fields {
 		"image":               m.ContainerStatus.Image,
 		"image_id":            m.ContainerStatus.ImageID,
 		"hash":                m.Hash,
-		"verification_date":   m.Verification.Date(),
+		"verification_date":   m.Verification.Date,
 		"verification_level":  m.Verification.Level,
 		"verification_status": m.Verification.Status,
-		"trusted":             m.Verification.Trusted(),
+		"trusted":             m.Verification.Trusted,
 	}
 }

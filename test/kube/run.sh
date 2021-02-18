@@ -24,6 +24,9 @@ kind load docker-image --name=$CLUSTER_NAME $KUBE_NOTARY_IMAGE:$KUBE_NOTARY_TAG
 kubectl  apply -f ../../test/e2e/tiller-rbac.yaml
 helm init --service-account tiller --history-max 200 --wait
 
+# Not needed in CodeNotary.io mode
+kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
+
 # Install kube-notary chart
 helm install \
     -n kube-notary ../../helm/kube-notary \

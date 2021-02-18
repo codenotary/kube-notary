@@ -18,4 +18,7 @@ RUN echo "curl -s 127.0.0.1:9581/results?output=bulk_sign" > /bin/bulk_sign \
 
 COPY --from=builder /src/kube-notary /bin/kube-notary
 
+# needed in CNLC mode
+RUN mkdir .vcn
+
 ENTRYPOINT [ "/bin/kube-notary" ]

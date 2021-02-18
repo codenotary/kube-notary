@@ -17,4 +17,8 @@ RUN curl -L https://git.io/get_helm.sh | sh
 ADD . /kube-notary
 
 WORKDIR /kube-notary/test/e2e
+
+# needed in CNLC mode
+RUN mkdir .vcn
+
 ENTRYPOINT [ "sh", "-c", "/kube-notary/test/e2e/run.sh" ]
