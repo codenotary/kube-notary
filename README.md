@@ -162,11 +162,11 @@ kubectl patch configmaps/kube-notary \
 
 `kube-notary` support the integration with [CodeNotary Ledger Compliance](https://www.codenotary.com/products/ledger-compliance/)
 To enable CNLC mode specify the followings operations are required:
-create api-key secret:
+* create api-key secret
  ```shell script
 kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
 ```
-Install helm chart with following parameters:
+* install helm chart with following parameters
 
 ```
 helm install \
