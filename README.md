@@ -186,7 +186,7 @@ helm install \
 >--set cnlc.host=$(hostname) \
 >```
 
-To sign an image use at least [vcn CLI](https://github.com/vchain-us/vcn) **v0.9.5** or at commit *572eaab2c322079f12f36ac8b3abed67fbba2c59* 
+To sign an image use at least [vcn CLI](https://github.com/vchain-us/vcn) **v0.9.5** or at commit *572eaab2c322079f12f36ac8b3abed67fbba2c59*
 
 ## FAQ
 
