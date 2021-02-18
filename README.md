@@ -5,13 +5,13 @@
 
 ## How it works
 
-**kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [CodeNotary](https://codenotary.io). 
+**kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [CodeNotary](https://codenotary.io).
 The idea behind CV is to continuously monitor your cluster at runtime and be notified when unknown or untrusted container images are running.
 
-Once `kube-notary` is installed within your cluster, all pods are checked every minute (interval and other settings can be [configured](#Configuration)). 
+Once `kube-notary` is installed within your cluster, all pods are checked every minute (interval and other settings can be [configured](#Configuration)).
 For each of the running containers in each pod, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the [hash's signature in the CodeNotary's blockchain](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#signatures).
 
-Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [grafana dashboard](grafana). 
+Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [grafana dashboard](grafana).
 
 Images you trust can be signed by using the CodeNotary [vcn](https://github.com/vchain-us/vcn) CLI tool.
 
@@ -94,11 +94,11 @@ Examples:
   export SERVICE_NAME=service/$(kubectl get service --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
   echo "Status page at http://127.0.0.1:9581/status/"
   kubectl port-forward --namespace default $SERVICE_NAME 9581
-``` 
+```
 
 ### Metrics
 
-If a Prometheus installation is running within your cluster, metrics provided by `kube-notary` will be automatically discovered. 
+If a Prometheus installation is running within your cluster, metrics provided by `kube-notary` will be automatically discovered.
 Furthermore, you can find an example of a preconfigured Grafana dashboard [here](grafana/).
 
 ## Configuration
@@ -128,8 +128,8 @@ helm install -n kube-notary helm/kube-notary --set "trust.keys={0x123..., 0x123.
 helm install -n kube-notary helm/kube-notary --set "trust.org=your.organization.com"
 ```
 
-#### Note 
-If both `trust.org` and `trust.keys` are set, only `trust.org` will be used. 
+#### Note
+If both `trust.org` and `trust.keys` are set, only `trust.org` will be used.
 
 If none is set, the last [signature](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#signatures) by the signer with the highest available [level](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#level) will be used during the verification.
 
@@ -140,8 +140,8 @@ The following options within [helm/kube-notary/values.yaml](helm/kube-notary/val
 # Runtime config
 log:
   level: info # verbosity level, one of: trace, debug, info, warn, error, fatal, panic
-watch: 
-  namespace: "" # the namespace name to watch 
+watch:
+  namespace: "" # the namespace name to watch
   interval: 60s # duration of the watching interval
 trust:
   org: "" # ID of the trusted organization, if not empty `keys` above will be ignored
@@ -150,7 +150,7 @@ trust:
    - ...
 ```
 
-During the installation, they are stored in a `configmap`. Configuration hot-reloading is supported, so you can modify and apply the configmap while `kube-notary` is running. 
+During the installation, they are stored in a `configmap`. Configuration hot-reloading is supported, so you can modify and apply the configmap while `kube-notary` is running.
 
 For example, to change the watching interval from default to `30s`:
 ```
@@ -158,12 +158,41 @@ kubectl patch configmaps/kube-notary \
     --type merge \
     -p '{"data":{"config.yaml":"log:\n  level: debug\nwatch: \n  namespace: \n  interval: 30s"}}'
 ```
+## CodeNotary Ledger Compliance
+
+`kube-notary` support the integration with [CodeNotary Ledger Compliance](https://www.codenotary.com/products/ledger-compliance/)
+To enable CNLC mode specify the followings operations are required:
+create api-key secret:
+ ```shell script
+kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
+```
+Install helm chart with following parameters:
+
+```
+helm install \
+    -n kube-notary ../../helm/kube-notary \
+    --set image.repository=$KUBE_NOTARY_IMAGE --set image.tag=$KUBE_NOTARY_TAG \
+    --set image.pullPolicy=Never \
+    --set cnlc.host={CNLC ip address, default nil} \
+    --set cnlc.port={CNLC port address, default 3324} \
+    --set cnlc.cert={CNLC certificate, default nil} \
+    --set cnlc.noTls={CNLC enable unsecure connections, default true} \
+    --set cnlc.skipTlsVerify={CNLC skip tls verification, default false} \
+    --wait
+```
+
+> In order to connect to a local(on cluster host) CNLC istance for debug as instance use
+>```
+>--set cnlc.host=$(hostname) \
+>```
+
+To sign an image use at least [vcn CLI](https://github.com/vchain-us/vcn) **v0.9.5** or at commit *572eaab2c322079f12f36ac8b3abed67fbba2c59* 
 
 ## FAQ
 
 ### Why *Continuous Verification* ?
 
-Things change over time. Suppose you signed an image because you trust it. Later, you find a security issue within the image or you just want to deprecate that version. When that happens you can simply use [vcn](https://github.com/vchain-us/vcn#basic-usage) to [untrust or unsupport](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#statuses) that image version. Once the image is not trusted anymore, 
+Things change over time. Suppose you signed an image because you trust it. Later, you find a security issue within the image or you just want to deprecate that version. When that happens you can simply use [vcn](https://github.com/vchain-us/vcn#basic-usage) to [untrust or unsupport](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#statuses) that image version. Once the image is not trusted anymore,
 thanks to `kube-notary` you can easily discover if the image is still running somewhere in your cluster.
 
 In general, verifying an image just before its execution is not enough because the image's status or the image that's used by a container can change over time. *Continuous Verification* ensures that you will always get noticed if an unwanted behavior occurs.
@@ -172,7 +201,7 @@ In general, verifying an image just before its execution is not enough because t
 
 You can easily sign your container's images by using the [vcn CLI](https://github.com/vchain-us/vcn) we provide separately.
 
-`vcn` supports local Docker installations out of the box using `docker://` prefix, followed by the image name or image reference. 
+`vcn` supports local Docker installations out of the box using `docker://` prefix, followed by the image name or image reference.
 You just have to pull the image you want to sign, then finally run `vcn sign`. Detailed instructions can be found [here](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/schemes/docker.md).
 
 Furthermore, if you want to bulk sign all images running inside your cluster, you will find below instructions to generate a script that automates the process.
@@ -183,7 +212,7 @@ kubectl exec --namespace default -t $POD_NAME sh /bin/bulk_sign > vcn_bulk_sign.
 chmod +x vcn_bulk_sign.sh && ./vcn_bulk_sign.sh
 ```
 > Note that a [CodeNotary](https://codenotary.io) account and a local installation of [vcn](https://github.com/vchain-us/vcn) are needed.
-> Also, make sure your `kubectl` is pointing to the context you want to use. 
+> Also, make sure your `kubectl` is pointing to the context you want to use.
 
 ### How can I be notified when untrusted images are runnig?
 
@@ -204,7 +233,7 @@ Recent versions of Kubernetes employ a [role-based access control](https://kuber
 Please use a high privileged account to install `kube-notary`. Alternatively, if you don't have cluster-wide access, you can still install `kube-notary` to work in a single namespace which you can access. See the [namespaced installation](#Namespaced) paragraph for further details.
 
 ### Helm error: release kube-watch failed: namespaces "..." is forbidden
-It might be possible that `tiller` (the Helm's server-side component) does not have permission to install `kube-notary`. 
+It might be possible that `tiller` (the Helm's server-side component) does not have permission to install `kube-notary`.
 
 When working within a [role-based access control](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) enabled Kubernetes installation, you may need to add a [service account with cluster-admin role](https://helm.sh/docs/using_helm/#tiller-and-role-based-access-control) for `tiller`.
 
@@ -225,10 +254,10 @@ See [#11](https://github.com/vchain-us/kube-notary/issues/11).
 ```
 make test/e2e
 ```
-## Developing 
+## Developing
 To launch a debug environment with kubernetes it's possible to use the make utilities with:
 ```shell script
-make image/debug 
+make image/debug
 make kubernetes/debug
 ```
 It launches a kubernetes cluster with [kind](https://github.com/kubernetes-sigs/kind) . A dlv debug server is launched inside the pod and it's possible to execute a remote debugging.
