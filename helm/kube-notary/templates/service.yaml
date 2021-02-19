@@ -4,6 +4,7 @@ metadata:
   name: {{ include "kube-notary.fullname" . }}
   labels:
 {{ include "kube-notary.labels" . | indent 4 }}
+    k8s-app: kube-notary
 spec:
   type: {{ .Values.service.type }}
   ports:

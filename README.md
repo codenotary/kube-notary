@@ -172,7 +172,7 @@ kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwm
 helm install \
     -n kube-notary ../../helm/kube-notary \
     --set image.repository=$KUBE_NOTARY_IMAGE --set image.tag=$KUBE_NOTARY_TAG \
-    --set image.pullPolicy=Never \
+    --set image.pullPolicy=Always \
     --set cnlc.host={CNLC ip address, default nil} \
     --set cnlc.port={CNLC port address, default 3324} \
     --set cnlc.cert={CNLC certificate, default nil} \
