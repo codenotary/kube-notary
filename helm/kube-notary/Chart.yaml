@@ -3,4 +3,4 @@ name: kube-notary
 description: A Kubernetes watchdog for verifying image trust with CodeNotary
 version: 0.2.2
 maintainer:
-    - leonardo@vchian.us
+    - michele@codenotary.com
