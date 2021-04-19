@@ -161,8 +161,8 @@ kubectl patch configmaps/kube-notary \
 ## CodeNotary Ledger Compliance
 
 `kube-notary` support the integration with [CodeNotary Ledger Compliance](https://www.codenotary.com/products/ledger-compliance/)
-To enable CNLC mode specify the followings operations are required:
-* create api-key secret
+To run in CNLC mode, the following steps are required:
+* create an api-key secret
  ```shell script
 kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
 ```
@@ -181,7 +181,7 @@ helm install \
     --wait
 ```
 
-> In order to connect to a local(on cluster host) CNLC istance for debug as instance use
+> In order to connect to a local (or cluster host) CNLC instance for debugging use
 >```
 >--set cnlc.host=$(hostname) \
 >```
