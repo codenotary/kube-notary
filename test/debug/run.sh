@@ -26,17 +26,22 @@ kubectl  apply -f ../../test/e2e/tiller-rbac.yaml
 helm init --service-account tiller --history-max 200 --wait
 
 # Not needed in CodeNotary.io mode
-kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
+kubectl create secret generic vcn-lc-api-key --from-literal=api-key=xxzjqhaztvkjxvoplhxsichcfnbvcbyatovh
 
 # Install kube-notary chart
 # Remove cnlc.host to disable Ledger Compliance mode
+# When debugging CNLC on the same network(hostNetwork: true in deployment config) cnlc.host need to be set to the docker bridge ip.
+# To retrieve it is possible to use:
+# docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}'
+# or
+# /sbin/ip route|awk 'FNR == 6 {print $9}'
 helm install \
     -n kube-notary ../../helm/kube-notary \
     --set debug=true \
     --set image.repository=kube-notary --set image.tag=debug\
     --set image.pullPolicy=Never \
     --set restartPolicy=Never \
-    --set cnlc.host=$(hostname) \
+    --set cnlc.host=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}') \
     --set watch.interval=10s \
     --wait
 
