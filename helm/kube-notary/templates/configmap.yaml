@@ -23,3 +23,5 @@ data:
       cert: {{ .Values.cnlc.cert }}
       noTls: {{ .Values.cnlc.noTls }}
       skipTlsVerify: {{ .Values.cnlc.skipTlsVerify }}
+      crossLedgerKeyLedgerName: {{ .Values.cnlc.crossLedgerKeyLedgerName }}
+      signerID: {{ .Values.cnlc.signerID }}

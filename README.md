@@ -178,6 +178,8 @@ helm install \
     --set cnlc.cert={CNLC certificate, default nil} \
     --set cnlc.noTls={CNLC enable unsecure connections, default true} \
     --set cnlc.skipTlsVerify={CNLC skip tls verification, default false} \
+    --set cnlc.signerID={CNLC parameter used to filter results on a specific signer ID, default nil} \
+    --set cnlc.crossLedgerKeyLedgerName={CNLC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
     --wait
 ```
 

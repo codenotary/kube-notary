@@ -14,16 +14,18 @@ import (
 
 // Configuration variables names
 const (
-	LogLevel        = "log.level"
-	WatchNamespace  = "watch.namespace"
-	WatchInterval   = "watch.interval"
-	TrustKeys       = "trust.keys"
-	TrustOrg        = "trust.org"
-	LcHost          = "cnlc.host"
-	LcPort          = "cnlc.port"
-	LcCert          = "cnlc.cert"
-	LcNoTls         = "cnlc.noTls"
-	LcSkipTlsVerify = "cnlc.skipTlsVerify"
+	LogLevel                   = "log.level"
+	WatchNamespace             = "watch.namespace"
+	WatchInterval              = "watch.interval"
+	TrustKeys                  = "trust.keys"
+	TrustOrg                   = "trust.org"
+	LcHost                     = "cnlc.host"
+	LcPort                     = "cnlc.port"
+	LcCert                     = "cnlc.cert"
+	LcNoTls                    = "cnlc.noTls"
+	LcSkipTlsVerify            = "cnlc.skipTlsVerify"
+	LcCrossLedgerKeyLedgerName = "cnlc.crossLedgerKeyLedgerName"
+	LcSignerID                 = "cnlc.signerID"
 )
 
 const (
@@ -42,6 +44,8 @@ type Interface interface {
 	LcCert() string
 	LcSkipTlsVerify() bool
 	LcNoTls() bool
+	LcCrossLedgerKeyLedgerName() string
+	LcSignerID() string
 }
 
 type cfg struct {
@@ -65,6 +69,8 @@ func New() (Interface, error) {
 	v.SetDefault(LcPort, "3324")
 	v.SetDefault(LcNoTls, true)
 	v.SetDefault(LcSkipTlsVerify, true)
+	v.SetDefault(LcCrossLedgerKeyLedgerName, "")
+	v.SetDefault(LcSignerID, "")
 
 	// Setup
 	v.AutomaticEnv()
@@ -141,4 +147,14 @@ func (c cfg) LcSkipTlsVerify() bool {
 // LcNoTls returns the CNLC no tls connection property as a bool
 func (c cfg) LcNoTls() bool {
 	return c.v.GetBool(LcNoTls)
+}
+
+// LcCrossLedgerKeyLedgerName parameter is used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Empty string is possible
+func (c cfg) LcCrossLedgerKeyLedgerName() string {
+	return c.v.GetString(LcCrossLedgerKeyLedgerName)
+}
+
+// LcSignerID parameter is used to filter result on a specific signer ID.
+func (c cfg) LcSignerID() string {
+	return c.v.GetString(LcSignerID)
 }

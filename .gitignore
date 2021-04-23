@@ -2,3 +2,6 @@
 /vendor
 /pkg/status/statik
 vcn_bulk_sign.sh
+
+# editor
+.idea/
