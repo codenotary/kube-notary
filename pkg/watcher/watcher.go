@@ -164,47 +164,41 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 
 		if w.cfg.LcHost() != "" {
 			hash = strings.TrimPrefix(hash, "sha256:")
-			ar, err := api.LcVerify(hash, w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
-			if err == api.ErrNotVerified {
-				v.Status = meta.StatusUnknown
-				v.Level = meta.LevelUnknown
-				v.Date = ""
-				v.Trusted = false
-				w.log.Errorf(`Image "%s" in pod "%s" is not verified: %s`, status.ImageID, pod.Name, err)
-			} else if api.ErrNotFound == err {
-				v.Status = meta.StatusUnknown
-				v.Level = meta.LevelUnknown
-				v.Date = ""
-				v.Trusted = false
-				w.log.Errorf(`Image "%s" in pod "%s" not found: %s`, status.ImageID, pod.Name, err)
-			} else if err != nil {
-				v.Status = meta.StatusUnknown
-				v.Level = meta.LevelUnknown
-				v.Date = ""
-				v.Trusted = false
-				errorList = append(errorList, err)
-				w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
-			} else {
-				v.Status = ar.Status
-				v.Level = meta.LevelCNLC
-				v.Date = ar.Date()
-				v.Trusted = true
-				w.log.Errorf(`Image "%s" verified in pod "%s"`, status.ImageID, pod.Name)
-			}
-
+			ar, err := api.PublicCNLCVerify(hash, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
 			metric := metrics.Metric{
 				Pod:             &pod,
 				ContainerStatus: &status,
 				Verification:    v,
 				Hash:            hash,
 			}
-			/*fields := metric.LogFields()
-			if verified {
+			fields := metric.LogFields()
+			switch err {
+			case api.ErrNotVerified:
+				v.Status = meta.StatusUnknown
+				v.Level = meta.LevelUnknown
+				v.Date = ""
+				v.Trusted = false
+				w.log.Warnf(`Image "%s" in pod "%s" is not verified: %s`, status.ImageID, pod.Name, err)
+			case api.ErrNotFound:
+				v.Status = meta.StatusUnknown
+				v.Level = meta.LevelUnknown
+				v.Date = ""
+				v.Trusted = false
+				w.log.Warnf(`Image "%s" in pod "%s" not found: %s`, status.ImageID, pod.Name, err)
+			case nil:
+				v.Status = ar.Status
+				v.Level = meta.LevelCNLC
+				v.Date = ar.Date()
+				v.Trusted = true
 				w.log.WithFields(*fields).Info("Image is trusted")
-			} else {
-				w.log.WithFields(*fields).Warn("Image is NOT trusted")
-			}*/
-
+			default:
+				v.Status = meta.StatusUnknown
+				v.Level = meta.LevelUnknown
+				v.Date = ""
+				v.Trusted = false
+				errorList = append(errorList, err)
+				w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+			}
 			w.rec.Record(metric)
 
 		} else {
