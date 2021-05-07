@@ -145,9 +145,10 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 	opts[l-1] = verify.WithAuthKeychain(keychain)
 
 	for _, status := range pod.Status.ContainerStatuses {
+		v := &verify.Verification{}
+
 		if status.State.Running == nil {
 			w.log.Infof(`Container "%s" in pod "%s" is not running: skipped`, status.Name, pod.Name)
-			continue
 		}
 		errorList := make([]error, 0)
 
@@ -155,14 +156,18 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			status.ImageID,
 			opts...,
 		)
+
 		if err != nil {
+			errorList = append(errorList, err)
+			v.Status = meta.StatusUnknown
+			v.Level = meta.LevelUnknown
+			v.Date = ""
+			v.Trusted = false
 			errorList = append(errorList, err)
 			w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
 		}
 
-		v := &verify.Verification{}
-
-		if w.cfg.LcHost() != "" {
+		if w.cfg.LcHost() != "" && hash != "" {
 			hash = strings.TrimPrefix(hash, "sha256:")
 			ar, err := api.PublicCNLCVerify(hash, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
 			metric := metrics.Metric{
