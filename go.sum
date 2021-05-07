@@ -1029,6 +1029,10 @@ github.com/vchain-us/vcn v0.9.5-0.20210423105440-89174054c691 h1:fbJmwqd2ZkkaJmF
 github.com/vchain-us/vcn v0.9.5-0.20210423105440-89174054c691/go.mod h1:cQuwu3gqRG7VWFrv4HvVzC3dqpJrMwTRemq78+fQ07w=
 github.com/vchain-us/vcn v0.9.5-0.20210423124120-36d5e2549f60 h1:lnJ3mVHrWrovBNFePVs2NDj2w7l3d5e6Zc0ZCXhaXpE=
 github.com/vchain-us/vcn v0.9.5-0.20210423124120-36d5e2549f60/go.mod h1:cQuwu3gqRG7VWFrv4HvVzC3dqpJrMwTRemq78+fQ07w=
+github.com/vchain-us/vcn v0.9.5-0.20210429094724-c685041d321d h1:bTkZm86YzUU1hsGVhB/DVPimR3y9A6JqZnRmpno2v80=
+github.com/vchain-us/vcn v0.9.5-0.20210429094724-c685041d321d/go.mod h1:cQuwu3gqRG7VWFrv4HvVzC3dqpJrMwTRemq78+fQ07w=
+github.com/vchain-us/vcn v0.9.5 h1:QB3xuICPVVwGRMo3SHFRu9VcaVNZSOYjrH0bzx2jEz8=
+github.com/vchain-us/vcn v0.9.5/go.mod h1:cQuwu3gqRG7VWFrv4HvVzC3dqpJrMwTRemq78+fQ07w=
 github.com/vdemeester/k8s-pkg-credentialprovider v1.13.12/go.mod h1:Fko0rTxEtDW2kju5Ky7yFJNS3IcNvW8IPsp4/e9oev0=
 github.com/vdemeester/k8s-pkg-credentialprovider v1.17.4/go.mod h1:inCTmtUdr5KJbreVojo06krnTgaeAz/Z7lynpPk/Q2c=
 github.com/vdemeester/k8s-pkg-credentialprovider v1.18.0/go.mod h1:inCTmtUdr5KJbreVojo06krnTgaeAz/Z7lynpPk/Q2c=
