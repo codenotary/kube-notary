@@ -1,7 +1,7 @@
 # kube-notary
 > A Kubernetes watchdog for verifying image trust with CodeNotary.
 
-![alt text](https://raw.githubusercontent.com/vchain-us/kube-notary/master/docs/images/info.png "CodeNotary for Kubernetes")
+<img src="https://raw.githubusercontent.com/vchain-us/kube-notary/master/docs/images/info.png" alt="CodeNotary for Kubernetes" width="800"/>
 
 ## How it works
 
