@@ -158,9 +158,9 @@ kubectl patch configmaps/kube-notary \
     --type merge \
     -p '{"data":{"config.yaml":"log:\n  level: debug\nwatch: \n  namespace: \n  interval: 30s"}}'
 ```
-## CodeNotary Ledger Compliance
+## CodeNotary Immutable Ledger
 
-`kube-notary` support the integration with [CodeNotary Ledger Compliance](https://www.codenotary.com/products/ledger-compliance/)
+`kube-notary` support the integration with [CodeNotary Immutable Ledger](https://www.codenotary.com/products/immutable-ledger/)
 To run in CNLC mode, the following steps are required:
 * create an api-key secret
  ```shell script
