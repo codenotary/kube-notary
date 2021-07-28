@@ -88,6 +88,7 @@ func (w *watchdog) Run() {
 		var opt verify.Option
 
 		if org != "" {
+			w.log.Debugf("verifing with org: %s", org)
 			delete(fields, config.TrustKeys)
 			fields[config.TrustOrg] = org
 			opt = verify.WithSignerOrg(org)
@@ -96,12 +97,20 @@ func (w *watchdog) Run() {
 				keys = nil
 			}
 		} else if len(keys) > 0 {
+			w.log.Debugf("verifing with keys: %+v", keys)
 			opt = verify.WithSignerKeys(keys...)
 		}
 
 		w.rec.Reset()
 
-		pods, err := clientset.CoreV1().Pods(ns).List(context.Background(), metav1.ListOptions{})
+		w.log.Debugf("Listing pods with clientset.CoreV1().Pods(ns).List")
+		ctx := context.Background()
+		w.log.Debugf("context %+v", ctx)
+		w.log.Debugf("list options: %+v", metav1.ListOptions{})
+		w.log.Debugf("namespace: %s", ns)
+
+		pods, err := clientset.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{})
+		w.log.Debugf("pods %+v", pods)
 		if err != nil {
 			fields["error"] = true
 			w.log.WithFields(fields).Errorf("Error getting pods: %s", err)

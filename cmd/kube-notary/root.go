@@ -44,6 +44,9 @@ func main() {
 	}
 	// creates the logger
 	logger := logrus.New()
+
+	logger.Debugf("kube client config %+v", clusterCfg)
+
 	// creates the metrics recorder
 	recorder := metrics.NewRecorder()
 	// creates the watcher configuration
@@ -51,6 +54,8 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+	logger.Debugf("watcher config %+v", cfg)
+
 	// creates and run the watcher
 	w, err := watcher.New(clientset, cfg, recorder, logger)
 	if err != nil {
