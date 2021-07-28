@@ -27,6 +27,8 @@ func getVerification(digest string, o *options) (hash string, verification *api.
 	} else {
 		verification, err = api.Verify(hash)
 	}
-	api.TrackVerify(nil, hash, digest)
+	if hash != "" && digest != "" {
+		api.TrackVerify(nil, hash, digest)
+	}
 	return
 }
