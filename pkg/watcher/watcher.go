@@ -136,6 +136,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 	for i, localRef := range pod.Spec.ImagePullSecrets {
 		pullSecrets[i] = localRef.Name
 	}
+	w.log.Debugf("#### -> pod %s ", pod.Name)
 
 	keychain, err := image.NewKeychain(
 		w.clientset,
@@ -154,6 +155,10 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 	opts[l-1] = verify.WithAuthKeychain(keychain)
 
 	for _, status := range pod.Status.ContainerStatuses {
+		w.log.Debugf("# -> pod status running: %v", status.State.Running)
+		w.log.Debugf("# -> pod status running: %v", status.State.Waiting)
+		w.log.Debugf("# -> pod status running: %v", status.State.Terminated)
+
 		v := &verify.Verification{}
 
 		if status.State.Running == nil {
@@ -161,10 +166,14 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		}
 		errorList := make([]error, 0)
 
+		w.log.Debugf("# -> status.ImageID: %s", status.ImageID)
+
 		hash, err := verify.ImageHash(
 			status.ImageID,
 			opts...,
 		)
+
+		w.log.Debugf("# -> verify.ImageHash: %s", hash)
 
 		if err != nil {
 			errorList = append(errorList, err)
@@ -177,6 +186,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		}
 
 		if w.cfg.LcHost() != "" && hash != "" {
+			w.log.Debugf("# -> vcn public verification on cnil: crossLedgerKey: %s, signerID: %s,  LcHost: %s, LcPort: %s, LcCert: %s, LcSkipTlsVerify: %v, LcNoTls: %v", w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
 			hash = strings.TrimPrefix(hash, "sha256:")
 			ar, err := api.PublicCNLCVerify(hash, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
 			metric := metrics.Metric{
@@ -216,6 +226,8 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			w.rec.Record(metric)
 
 		} else {
+			w.log.Debugf("we should not be here!")
+
 			verification, err := verify.ImageVerify(hash, opts...)
 
 			if err != nil {
