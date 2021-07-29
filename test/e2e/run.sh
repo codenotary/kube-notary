@@ -18,9 +18,9 @@ kind load docker-image --name=$CLUSTER_NAME kube-notary:test
 KUBECONFIG=$(kind get kubeconfig-path --name=$CLUSTER_NAME)
 CONTEXT=kubernetes-admin@$CLUSTER_NAME
 
-# Setup tiller service account and init Helm
-kubectl --kubeconfig $KUBECONFIG --context $CONTEXT apply -f ./tiller-rbac.yaml
-helm init --kubeconfig $KUBECONFIG --kube-context $CONTEXT --service-account tiller --history-max 200 --wait
+# HELM v2 Setup tiller service account and init Helm
+# kubectl --kubeconfig $KUBECONFIG --context $CONTEXT apply -f ./tiller-rbac.yaml
+# helm init --kubeconfig $KUBECONFIG --kube-context $CONTEXT --service-account tiller --history-max 200 --wait
 
 # Install kube-notary chart
 helm install --kubeconfig $KUBECONFIG --kube-context $CONTEXT \
