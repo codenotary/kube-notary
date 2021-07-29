@@ -137,6 +137,10 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		pullSecrets[i] = localRef.Name
 	}
 	w.log.Debugf("#### -> pod %s ", pod.Name)
+	w.log.Debugf("## -> pod clientset %+v ", w.clientset)
+	w.log.Debugf("## -> pod %s ", pod.Namespace)
+	w.log.Debugf("## -> pod san %s ", pod.Spec.ServiceAccountName)
+	w.log.Debugf("## -> pod pull secrets %+v ", pullSecrets)
 
 	keychain, err := image.NewKeychain(
 		w.clientset,
@@ -144,20 +148,25 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		pod.Spec.ServiceAccountName,
 		pullSecrets,
 	)
+
 	if err != nil {
 		w.log.Warnf(`Keychain error in pod "%s": %s`, pod.Name, err)
+		w.log.Debugf(`Keychain error in pod "%s": %s`, pod.Name, err)
 	}
 
 	// make options
 	l := len(options) + 1
 	opts := make([]verify.Option, len(options)+1)
 	copy(opts, options)
+	w.log.Debugf(`Verify.WithAuthKeychain %+v`, keychain)
 	opts[l-1] = verify.WithAuthKeychain(keychain)
 
+	w.log.Debugf(`pod.Status.ContainerStatuses %+v`, pod.Status.ContainerStatuses)
+
 	for _, status := range pod.Status.ContainerStatuses {
-		w.log.Debugf("# -> pod status running: %v", status.State.Running)
-		w.log.Debugf("# -> pod status running: %v", status.State.Waiting)
-		w.log.Debugf("# -> pod status running: %v", status.State.Terminated)
+		w.log.Debugf("# -> pod status running: %+v", status.State.Running)
+		w.log.Debugf("# -> pod status running: %+v", status.State.Waiting)
+		w.log.Debugf("# -> pod status running: %+v", status.State.Terminated)
 
 		v := &verify.Verification{}
 
