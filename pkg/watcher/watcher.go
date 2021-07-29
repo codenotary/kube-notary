@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/vchain-us/kube-notary/pkg/config"
-	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
 	"github.com/vchain-us/kube-notary/pkg/verify"
 
@@ -142,7 +141,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 	w.log.Debugf("## -> pod san %s ", pod.Spec.ServiceAccountName)
 	w.log.Debugf("## -> pod pull secrets %+v ", pullSecrets)
 
-	keychain, err := image.NewKeychain(
+	/*keychain, err := image.NewKeychain(
 		w.clientset,
 		pod.Namespace,
 		pod.Spec.ServiceAccountName,
@@ -159,7 +158,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 	opts := make([]verify.Option, len(options)+1)
 	copy(opts, options)
 	w.log.Debugf(`Verify.WithAuthKeychain %+v`, keychain)
-	opts[l-1] = verify.WithAuthKeychain(keychain)
+	opts[l-1] = verify.WithAuthKeychain(keychain)*/
 
 	w.log.Debugf(`pod.Status.ContainerStatuses %+v`, pod.Status.ContainerStatuses)
 
@@ -179,7 +178,6 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 
 		hash, err := verify.ImageHash(
 			status.ImageID,
-			opts...,
 		)
 
 		w.log.Debugf("# -> verify.ImageHash: %s", hash)
@@ -237,7 +235,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		} else {
 			w.log.Debugf("we should not be here!")
 
-			verification, err := verify.ImageVerify(hash, opts...)
+			verification, err := verify.ImageVerify(hash)
 
 			if err != nil {
 				errorList = append(errorList, err)
