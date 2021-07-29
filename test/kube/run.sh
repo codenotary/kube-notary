@@ -6,6 +6,8 @@
 # https://www.gnu.org/licenses/gpl-3.0.en.html
 
 # Creates a local kube-notary cluster with kind.
+# Please make sure helm 3 is installed
+
 set -euo pipefail
 
 CLUSTER_NAME=kube-notary-cluster
@@ -21,18 +23,18 @@ kubectl cluster-info --context kind-$CLUSTER_NAME
 kind load docker-image --name=$CLUSTER_NAME $KUBE_NOTARY_IMAGE:$KUBE_NOTARY_TAG
 
 # Setup tiller service account and init Helm
-kubectl  apply -f ../../test/e2e/tiller-rbac.yaml
-helm init --service-account tiller --history-max 200 --wait
+# kubectl  apply -f ../../test/e2e/tiller-rbac.yaml
+# helm init --service-account tiller --history-max 200 --wait
 
 # Not needed in CodeNotary.io mode
 # kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
 
 # Install kube-notary chart
 helm install \
-    -n kube-notary ../../helm/kube-notary \
+    -n default kubeinstance ../../helm/kube-notary \
     --set image.repository=$KUBE_NOTARY_IMAGE --set image.tag=$KUBE_NOTARY_TAG \
     --set image.pullPolicy=Never \
     --wait
 
-export SERVICE_NAME=service/$(kubectl get service --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
+export SERVICE_NAME=service/kubeinstance-kube-notary
 kubectl port-forward --namespace default $SERVICE_NAME 9581

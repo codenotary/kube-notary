@@ -7,6 +7,7 @@
 
 # Creates a local kube-notary cluster with kind for debug pupose.
 # A debug image with a delve server is launched. Debugger is bind at 40000 port.
+# Please make sure helm 3 is installed
 
 set -euo pipefail
 
@@ -21,12 +22,12 @@ kind create cluster --name=$CLUSTER_NAME
 kubectl cluster-info --context kind-$CLUSTER_NAME
 kind load docker-image --name=$CLUSTER_NAME $KUBE_NOTARY_IMAGE
 
-# Setup tiller service account and init Helm
-kubectl  apply -f ../../test/e2e/tiller-rbac.yaml
-helm init --service-account tiller --history-max 200 --wait
+# HELM v2 Setup tiller service account and init Helm
+# kubectl  apply -f ../../test/e2e/tiller-rbac.yaml
+# helm init --service-account tiller --history-max 200 --wait
 
 # Not needed in CodeNotary.io mode
-kubectl create secret generic vcn-lc-api-key --from-literal=api-key=xxzjqhaztvkjxvoplhxsichcfnbvcbyatovh
+kubectl create secret generic vcn-lc-api-key --from-literal=api-key=kube.izZQyDUfWnOSwSZefrOUThcVdbGBOouzKnHf
 
 # Install kube-notary chart
 # Remove cnlc.host to disable Ledger Compliance mode
@@ -36,7 +37,7 @@ kubectl create secret generic vcn-lc-api-key --from-literal=api-key=xxzjqhaztvkj
 # or
 # /sbin/ip route|awk 'FNR == 6 {print $9}'
 helm install \
-    -n kube-notary ../../helm/kube-notary \
+    -n default kubeinstance ../../helm/kube-notary \
     --set debug=true \
     --set image.repository=kube-notary --set image.tag=debug\
     --set image.pullPolicy=Never \
@@ -45,6 +46,6 @@ helm install \
     --set watch.interval=10s \
     --wait
 
-export SERVICE_NAME=service/$(kubectl get service --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
-kubectl port-forward --namespace default $SERVICE_NAME 9581 &
-kubectl port-forward --namespace default $SERVICE_NAME 40000 &
+export SERVICE_NAME=service/kubeinstance-kube-notary
+kubectl port-forward $SERVICE_NAME 9581 &
+kubectl port-forward $SERVICE_NAME 40000 &
