@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/vchain-us/kube-notary/pkg/config"
+	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
 	"github.com/vchain-us/kube-notary/pkg/verify"
 
@@ -127,6 +128,22 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		pullSecrets[i] = localRef.Name
 	}
 
+	keychain, err := image.NewKeychain(
+		w.clientset,
+		pod.Namespace,
+		pod.Spec.ServiceAccountName,
+		pullSecrets,
+	)
+	if err != nil {
+		w.log.Warnf(`Keychain error in pod "%s": %s`, pod.Name, err)
+	}
+
+	// make options
+	l := len(options) + 1
+	opts := make([]verify.Option, len(options)+1)
+	copy(opts, options)
+	opts[l-1] = verify.WithAuthKeychain(keychain)
+
 	for _, status := range pod.Status.ContainerStatuses {
 		v := &verify.Verification{}
 
@@ -137,6 +154,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 
 		hash, err := verify.ImageHash(
 			status.ImageID,
+			opts...,
 		)
 
 		if err != nil {
@@ -189,7 +207,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			w.rec.Record(metric)
 
 		} else {
-			verification, err := verify.ImageVerify(hash)
+			verification, err := verify.ImageVerify(hash, opts...)
 
 			if err != nil {
 				errorList = append(errorList, err)
