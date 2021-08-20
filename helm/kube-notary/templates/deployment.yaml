@@ -28,6 +28,9 @@ spec:
         - name: config-volume
           configMap:
             name: {{ include "kube-notary.fullname" . }}
+      hostAliases:
+        - ip: "169.254.169.254"
+          hostnames: ["metadata.google.internal"]
       containers:
         - name: {{ .Chart.Name }}
           {{- if .Values.debug }}
