@@ -14,9 +14,9 @@ trust:
 
 cnlc:
   host:
-  port: 3324
+  port: 443
   cert:
-  noTls: true
+  noTls: false
   skipTlsVerify: false
 
 # Installation config
