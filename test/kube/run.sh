@@ -28,12 +28,14 @@ kind load docker-image --name=$CLUSTER_NAME $KUBE_NOTARY_IMAGE:$KUBE_NOTARY_TAG
 
 # Not needed in CodeNotary.io mode
 # kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
+kubectl create secret generic vcn-lc-api-key --from-literal=api-key=kube.VLsPOdYYoHuFSzEQeMladkSTCupHYDUaQVmK
 
 # Install kube-notary chart
 helm install \
     -n default kubeinstance ../../helm/kube-notary \
     --set image.repository=$KUBE_NOTARY_IMAGE --set image.tag=$KUBE_NOTARY_TAG \
     --set image.pullPolicy=Never \
+    --set cnlc.host=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}') \
     --wait
 
 export SERVICE_NAME=service/kubeinstance-kube-notary
