@@ -28,11 +28,11 @@ kube-notary/debug: ## Build kube-notary not optimized binary (-gcflags='all=-N -
 
 .PHONY: image
 image: ## Build kube-notary image
-	$(DOCKER) build -t $(REGISTRY_IMAGE) -f ./Dockerfile .
+	DOCKER_BUILDKIT=1 $(DOCKER) build -t $(REGISTRY_IMAGE) -f ./Dockerfile --ssh default .
 
 .PHONY: image/debug
 image/debug: ## Build kube-notary debug image kube-notary:debug
-	$(DOCKER) build -t kube-notary:debug -f ./Dockerfile.debug .
+	DOCKER_BUILDKIT=1 $(DOCKER) build -t kube-notary:debug -f ./Dockerfile.debug --ssh default .
 
 .PHONY: image.push
 image.push: image ## Push image in the registry

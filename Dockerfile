@@ -5,8 +5,17 @@
 
 FROM golang:1.15 as builder
 WORKDIR /src
+
+RUN apt-get install --no-install-recommends -y openssh-client
+# Allow downloading vcn-enterprise using ssh agent forwarding
+RUN mkdir ~/.ssh
+RUN ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+ENV GOPRIVATE=github.com/codenotary/vcn-enterprise
+RUN git config --global url."git@github.com:codenotary/vcn-enterprise".insteadOf "https://github.com/codenotary/vcn-enterprise"
+
 COPY . .
-RUN make kube-notary
+RUN --mount=type=ssh \
+  make kube-notary
 
 FROM alpine:3.10
 
