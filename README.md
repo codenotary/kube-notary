@@ -161,7 +161,7 @@ kubectl patch configmaps/kube-notary \
 ## CodeNotary Immutable Ledger
 
 `kube-notary` support the integration with [CodeNotary Immutable Ledger](https://www.codenotary.com/products/immutable-ledger/)
-To run in CNLC mode, the following steps are required:
+To run in CNC mode, the following steps are required:
 * create an api-key secret
  ```shell script
 kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
@@ -173,19 +173,19 @@ helm install \
     -n kube-notary ../../helm/kube-notary \
     --set image.repository=$KUBE_NOTARY_IMAGE --set image.tag=$KUBE_NOTARY_TAG \
     --set image.pullPolicy=Always \
-    --set cnlc.host={CNLC ip address, default nil} \
-    --set cnlc.port={CNLC port address, default 3324} \
-    --set cnlc.cert={CNLC certificate, default nil} \
-    --set cnlc.noTls={CNLC enable unsecure connections, default true} \
-    --set cnlc.skipTlsVerify={CNLC skip tls verification, default false} \
-    --set cnlc.signerID={CNLC parameter used to filter results on a specific signer ID, default nil} \
-    --set cnlc.crossLedgerKeyLedgerName={CNLC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
+    --set cnc.host={CNC ip address, default nil} \
+    --set cnc.port={CNC port address, default 3324} \
+    --set cnc.cert={CNC certificate, default nil} \
+    --set cnc.noTls={CNC enable unsecure connections, default true} \
+    --set cnc.skipTlsVerify={CNC skip tls verification, default false} \
+    --set cnc.signerID={CNC parameter used to filter results on a specific signer ID, default nil} \
+    --set cnc.crossLedgerKeyLedgerName={CNC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
     --wait
 ```
 
-> In order to connect to a local (or cluster host) CNLC instance for debugging use
+> In order to connect to a local (or cluster host) CNC instance for debugging use
 >```
->--set cnlc.host=$(hostname) \
+>--set cnc.host=$(hostname) \
 >```
 
 To sign an image use at least [vcn CLI](https://github.com/vchain-us/vcn) **v0.9.5** or at commit *572eaab2c322079f12f36ac8b3abed67fbba2c59*

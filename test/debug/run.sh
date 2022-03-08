@@ -30,8 +30,7 @@ kind load docker-image --name=$CLUSTER_NAME $KUBE_NOTARY_IMAGE
 kubectl create secret generic vcn-lc-api-key --from-literal=api-key=kube.izZQyDUfWnOSwSZefrOUThcVdbGBOouzKnHf
 
 # Install kube-notary chart
-# Remove cnlc.host to disable Ledger Compliance mode
-# When debugging CNLC on the same network(hostNetwork: true in deployment config) cnlc.host need to be set to the docker bridge ip.
+# When debugging CNC on the same network(hostNetwork: true in deployment config) cnc.host need to be set to the docker bridge ip.
 # To retrieve it is possible to use:
 # docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}'
 # or
@@ -42,7 +41,9 @@ helm install \
     --set image.repository=kube-notary --set image.tag=debug\
     --set image.pullPolicy=Never \
     --set restartPolicy=Never \
-    --set cnlc.host=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}') \
+    --set cnc.port=3324 \
+    --set cnc.noTls=true \
+    --set cnc.host=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}') \
     --set watch.interval=10s \
     --wait
 

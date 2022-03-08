@@ -12,7 +12,7 @@ trust:
   org: ""
   keys: []
 
-cnlc:
+cnc:
   host:
   port: 443
   cert:

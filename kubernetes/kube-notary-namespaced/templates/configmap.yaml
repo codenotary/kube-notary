@@ -17,7 +17,7 @@ data:
     trust:
       org:
       keys:
-    cnlc:
+    cnc:
       host:
       port: 3324
       cert:

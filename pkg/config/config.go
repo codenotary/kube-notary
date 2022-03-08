@@ -19,13 +19,13 @@ const (
 	WatchInterval              = "watch.interval"
 	TrustKeys                  = "trust.keys"
 	TrustOrg                   = "trust.org"
-	LcHost                     = "cnlc.host"
-	LcPort                     = "cnlc.port"
-	LcCert                     = "cnlc.cert"
-	LcNoTls                    = "cnlc.noTls"
-	LcSkipTlsVerify            = "cnlc.skipTlsVerify"
-	LcCrossLedgerKeyLedgerName = "cnlc.crossLedgerKeyLedgerName"
-	LcSignerID                 = "cnlc.signerID"
+	LcHost                     = "cnc.host"
+	LcPort                     = "cnc.port"
+	LcCert                     = "cnc.cert"
+	LcNoTls                    = "cnc.noTls"
+	LcSkipTlsVerify            = "cnc.skipTlsVerify"
+	LcCrossLedgerKeyLedgerName = "cnc.crossLedgerKeyLedgerName"
+	LcSignerID                 = "cnc.signerID"
 )
 
 const (
@@ -124,27 +124,27 @@ func (c cfg) TrustedOrg() string {
 	return c.v.GetString(TrustOrg)
 }
 
-// LcHost returns CNLC connection host as a string
+// LcHost returns CNC connection host as a string
 func (c cfg) LcHost() string {
 	return c.v.GetString(LcHost)
 }
 
-// LcCert returns CNLC connection port as a string
+// LcCert returns CNC connection port as a string
 func (c cfg) LcPort() string {
 	return c.v.GetString(LcPort)
 }
 
-// LcCert returns CNLC connection certificate as a string
+// LcCert returns CNC connection certificate as a string
 func (c cfg) LcCert() string {
 	return c.v.GetString(LcCert)
 }
 
-// LcSkipTlsVerify returns the CNLC LcSkipTlsVerify connection property as a bool
+// LcSkipTlsVerify returns the CNC LcSkipTlsVerify connection property as a bool
 func (c cfg) LcSkipTlsVerify() bool {
 	return c.v.GetBool(LcSkipTlsVerify)
 }
 
-// LcNoTls returns the CNLC no tls connection property as a bool
+// LcNoTls returns the CNC no tls connection property as a bool
 func (c cfg) LcNoTls() bool {
 	return c.v.GetBool(LcNoTls)
 }

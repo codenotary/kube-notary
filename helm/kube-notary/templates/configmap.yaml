@@ -17,11 +17,11 @@ data:
         {{- range .Values.trust.keys }}
         - {{ . | quote }}
         {{- end }}
-    cnlc:
-      host: {{ .Values.cnlc.host }}
-      port: {{ .Values.cnlc.port }}
-      cert: {{ .Values.cnlc.cert }}
-      noTls: {{ .Values.cnlc.noTls }}
-      skipTlsVerify: {{ .Values.cnlc.skipTlsVerify }}
-      crossLedgerKeyLedgerName: {{ .Values.cnlc.crossLedgerKeyLedgerName }}
-      signerID: {{ .Values.cnlc.signerID }}
+    cnc:
+      host: {{ .Values.cnc.host }}
+      port: {{ .Values.cnc.port }}
+      cert: {{ .Values.cnc.cert }}
+      noTls: {{ .Values.cnc.noTls }}
+      skipTlsVerify: {{ .Values.cnc.skipTlsVerify }}
+      crossLedgerKeyLedgerName: {{ .Values.cnc.crossLedgerKeyLedgerName }}
+      signerID: {{ .Values.cnc.signerID }}
