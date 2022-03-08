@@ -11,8 +11,8 @@ package watcher
 import (
 	"context"
 	"fmt"
-	"github.com/vchain-us/vcn/pkg/api"
-	"github.com/vchain-us/vcn/pkg/meta"
+	"github.com/codenotary/vcn-enterprise/pkg/api"
+	"github.com/codenotary/vcn-enterprise/pkg/meta"
 	"net/http"
 	"strings"
 	"sync"
@@ -206,40 +206,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			}
 			w.rec.Record(metric)
 
-		} else {
-			verification, err := verify.ImageVerify(hash, opts...)
-
-			if err != nil {
-				errorList = append(errorList, err)
-				w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
-			} else {
-				metric := metrics.Metric{
-					Pod:             &pod,
-					ContainerStatus: &status,
-					Hash:            hash,
-				}
-				if verification != nil {
-					v = &verify.Verification{}
-					v.Status = verification.Status
-					v.Level = verification.Level
-					v.Date = verification.Date()
-					v.Trusted = verification.Trusted()
-					metric.Verification = v
-
-					fields := metric.LogFields()
-					if verification.Trusted() {
-						w.log.WithFields(*fields).Info("Image is trusted")
-					} else {
-						w.log.WithFields(*fields).Warn("Image is NOT trusted")
-					}
-
-				}
-
-				w.rec.Record(metric)
-			}
-
 		}
-
 		// update or insert the result into tmp list
 		w.upsert(pod, status, v, hash, errorList)
 	}

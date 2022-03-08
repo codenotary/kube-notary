@@ -10,7 +10,6 @@ package verify
 
 import (
 	"github.com/vchain-us/kube-notary/pkg/image"
-	"github.com/vchain-us/vcn/pkg/api"
 )
 
 // ImageHash returns the hash string and the BlockchainVerification for the given imageID
@@ -20,13 +19,4 @@ func ImageHash(imageID string, options ...Option) (hash string, err error) {
 		return
 	}
 	return image.Resolve(imageID, o.keychain)
-}
-
-func ImageVerify(hash string, options ...Option) (verification *api.BlockchainVerification, err error) {
-	o, err := makeOptions(options...)
-	if err != nil {
-		return
-	}
-	_, v, e := getVerification(hash, o)
-	return v, e
 }

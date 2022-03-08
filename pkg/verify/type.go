@@ -1,6 +1,6 @@
 package verify
 
-import "github.com/vchain-us/vcn/pkg/meta"
+import "github.com/codenotary/vcn-enterprise/pkg/meta"
 
 type Verification struct {
 	Level   meta.Level  `json:"level"`
