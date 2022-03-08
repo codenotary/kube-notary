@@ -194,7 +194,10 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 				v.Status = ar.Status
 				v.Level = meta.LevelCNLC
 				v.Date = ar.Date()
-				v.Trusted = true
+				v.Trusted = false
+				if ar.Status == meta.StatusTrusted {
+					v.Trusted = true
+				}
 				w.log.WithFields(*fields).Info("Image is trusted")
 			default:
 				v.Status = meta.StatusUnknown
