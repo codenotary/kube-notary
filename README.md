@@ -5,7 +5,7 @@
 
 ## How it works
 
-**kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [CodeNotary](https://codenotary.io).
+**kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [CodeNotary Cloud](https://codenotary.com/products/ci-cd/).
 The idea behind CV is to continuously monitor your cluster at runtime and be notified when unknown or untrusted container images are running.
 
 Once `kube-notary` is installed within your cluster, all pods are checked every minute (interval and other settings can be [configured](#Configuration)).
@@ -13,7 +13,7 @@ For each of the running containers in each pod, `kube-notary` resolves the `Imag
 
 Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [grafana dashboard](grafana).
 
-Images you trust can be signed by using the CodeNotary [vcn](https://github.com/vchain-us/vcn) CLI tool.
+Images you trust can be signed by using the CodeNotary vcn CLI tool.
 
 https://infograph.venngage.com/ps/ex4ECrROPCQ/codenotary-for-kubernetes
 
@@ -27,17 +27,31 @@ Then, to install `kube-notary`:
 
 * Clone this repository locally: https://github.com/vchain-us/kube-notary
 * Change directory into `kube-notary`.
-* Finally run:
 
-Helm v2
+To run the following steps are required:
+* create an api-key secret
+ ```shell script
+kubectl create secret generic vcn-lc-api-key --from-literal=api-key={a valid api key}
 ```
-helm install -n kube-notary helm/kube-notary
+> Note: You can obtain an api-key from [CodeNotary Cloud](https://codenotary.com/products/ci-cd/).
+
+* Install helm chart with following parameters:
+```
+helm install \
+    -n kube-notary ../../helm/kube-notary \
+    --set image.repository=$KUBE_NOTARY_IMAGE --set image.tag=$KUBE_NOTARY_TAG \
+    --set image.pullPolicy=Always \
+    --set cnc.host={CNC ip address, default nil} \
+    --set cnc.port={CNC port address, default 3324} \
+    --set cnc.cert={CNC certificate, default nil} \
+    --set cnc.noTls={CNC enable unsecure connections, default true} \
+    --set cnc.skipTlsVerify={CNC skip tls verification, default false} \
+    --set cnc.signerID={CNC parameter used to filter results on a specific signer ID, default nil} \
+    --set cnc.crossLedgerKeyLedgerName={CNC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
+    --wait
 ```
 
-Helm v3
-```
-helm install kube-notary helm/kube-notary -n kube-notary
-```
+To sign an image use  vcn CLI. Please contact CodeNotary support for more information.
 
 > See the [Configuration](#Configuration) paragraph for detailed instructions.
 
@@ -85,16 +99,6 @@ Examples:
   kubectl exec --namespace default -t $POD_NAME sh /bin/bulk_sign > vcn_bulk_sign.sh
   chmod +x vcn_bulk_sign.sh && ./vcn_bulk_sign.sh
 ```
-### Status page
-
-`kube-notary` provides an embedded status page with details of running containers and verifications. Once `kube-notary` is up and running the page is available at `http://$SERVICE_ADDRESS:9581/status/` (the service address depends on your installation). If you installed it by using the provided helm chart, the easiest way to get the status page URL is:
-
-```
-  # Status page
-  export SERVICE_NAME=service/$(kubectl get service --namespace default -l "app.kubernetes.io/name=kube-notary,app.kubernetes.io/instance=kube-notary" -o jsonpath="{.items[0].metadata.name}")
-  echo "Status page at http://127.0.0.1:9581/status/"
-  kubectl port-forward --namespace default $SERVICE_NAME 9581
-```
 
 ### Metrics
 
@@ -110,29 +114,6 @@ For example, to instruct `kube-notary` to check only the `kube-system` namespace
 ```
 helm install -n kube-notary helm/kube-notary --set watch.namespace="kube-system"
 ```
-
-### Trusted signers
-
-Choosing signers who can be trusted is easy. At install time, you can `--set` one of the following options.
-
-#### Configure a list of trusted keys
-
-Lists can be expressed by enclosing keys in `{` and `}` separated by `,`. For example:
-```
-helm install -n kube-notary helm/kube-notary --set "trust.keys={0x123..., 0x123...}"
-```
-
-#### Configure a trusted organization
-
-```
-helm install -n kube-notary helm/kube-notary --set "trust.org=your.organization.com"
-```
-
-#### Note
-If both `trust.org` and `trust.keys` are set, only `trust.org` will be used.
-
-If none is set, the last [signature](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#signatures) by the signer with the highest available [level](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#level) will be used during the verification.
-
 ### Runtime configuration
 
 The following options within [helm/kube-notary/values.yaml](helm/kube-notary/values.yaml) have effect on the `kube-notary` runtime behavior.
@@ -143,9 +124,6 @@ log:
 watch:
   namespace: "" # the namespace name to watch
   interval: 60s # duration of the watching interval
-trust:
-  org: "" # ID of the trusted organization, if not empty `keys` above will be ignored
-  keys: # array of signing keys to verify against
    - ...
    - ...
 ```
@@ -158,37 +136,7 @@ kubectl patch configmaps/kube-notary \
     --type merge \
     -p '{"data":{"config.yaml":"log:\n  level: debug\nwatch: \n  namespace: \n  interval: 30s"}}'
 ```
-## CodeNotary Immutable Ledger
 
-`kube-notary` support the integration with [CodeNotary Immutable Ledger](https://www.codenotary.com/products/immutable-ledger/)
-To run in CNC mode, the following steps are required:
-* create an api-key secret
- ```shell script
-kubectl create secret generic vcn-lc-api-key --from-literal=api-key=trqgnxwyjdwmcuajmczcrtjccagzhiawzkod
-```
-* install helm chart with following parameters
-
-```
-helm install \
-    -n kube-notary ../../helm/kube-notary \
-    --set image.repository=$KUBE_NOTARY_IMAGE --set image.tag=$KUBE_NOTARY_TAG \
-    --set image.pullPolicy=Always \
-    --set cnc.host={CNC ip address, default nil} \
-    --set cnc.port={CNC port address, default 3324} \
-    --set cnc.cert={CNC certificate, default nil} \
-    --set cnc.noTls={CNC enable unsecure connections, default true} \
-    --set cnc.skipTlsVerify={CNC skip tls verification, default false} \
-    --set cnc.signerID={CNC parameter used to filter results on a specific signer ID, default nil} \
-    --set cnc.crossLedgerKeyLedgerName={CNC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
-    --wait
-```
-
-> In order to connect to a local (or cluster host) CNC instance for debugging use
->```
->--set cnc.host=$(hostname) \
->```
-
-To sign an image use at least [vcn CLI](https://github.com/vchain-us/vcn) **v0.9.5** or at commit *572eaab2c322079f12f36ac8b3abed67fbba2c59*
 
 ## FAQ
 
@@ -201,10 +149,9 @@ In general, verifying an image just before its execution is not enough because t
 
 ### How can I sign my image?
 
-You can easily sign your container's images by using the [vcn CLI](https://github.com/vchain-us/vcn) we provide separately.
+You can easily sign your container's images by using the vcn CLI we provide separately.
 
 `vcn` supports local Docker installations out of the box using `docker://` prefix, followed by the image name or image reference.
-You just have to pull the image you want to sign, then finally run `vcn sign`. Detailed instructions can be found [here](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/schemes/docker.md).
 
 Furthermore, if you want to bulk sign all images running inside your cluster, you will find below instructions to generate a script that automates the process.
 
@@ -213,7 +160,7 @@ Export `POD_NAME` setting it to the `kube-notary`'s pod name, then run:
 kubectl exec --namespace default -t $POD_NAME sh /bin/bulk_sign > vcn_bulk_sign.sh
 chmod +x vcn_bulk_sign.sh && ./vcn_bulk_sign.sh
 ```
-> Note that a [CodeNotary](https://codenotary.io) account and a local installation of [vcn](https://github.com/vchain-us/vcn) are needed.
+> Note that a [CodeNotary](https://codenotary.io) account and a local installation of vcn are needed.
 > Also, make sure your `kubectl` is pointing to the context you want to use.
 
 ### How can I be notified when untrusted images are runnig?
