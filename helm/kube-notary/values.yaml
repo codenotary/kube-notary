@@ -17,7 +17,7 @@ cnc:
   port: 443
   cert:
   noTls: false
-  skipTlsVerify: false
+  skipTlsVerify: true
   signerID:
 
 # Installation config
