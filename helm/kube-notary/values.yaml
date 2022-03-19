@@ -18,6 +18,7 @@ cnc:
   cert:
   noTls: false
   skipTlsVerify: false
+  signerID:
 
 # Installation config
 service:
