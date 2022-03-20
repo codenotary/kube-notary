@@ -8,17 +8,23 @@ const script = `#!/usr/bin/env bash
         
 set -euo pipefail
 
+# Read the login variables
+echo -n CNC API key: 
+read -s apikey
+echo
+
+echo -n CNC API Host:
+read -s cnchost
+echo
+
+echo
+
+export VCN_LC_API_KEY=$apikey
+export VCN_LC_HOST=$cnchost
+
 # Ensure authentication
 vcn login
 
-# Read the passphrase
-echo -n Key passphrase: 
-read -s passphrase
-echo
-echo
-
-export KEYSTORE_PASSWORD=$passphrase
-export VCN_NOTARIZATION_PASSWORD=$passphrase
 
 # Bulk sign
 echo Signing...
@@ -26,7 +32,7 @@ echo
 
 {{ range .Results -}}
 {{ if .Hash -}}
-vcn s --hash {{ .Hash }} --name "{{ if not .Containers -}}
+vcn n --hash {{ .Hash }} --name "{{ if not .Containers -}}
 		sha256:{{ .Hash }}
 	{{- else -}}
 		{{ with index .Containers 0 }}{{ .Image }}{{ end }}

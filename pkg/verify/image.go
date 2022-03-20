@@ -12,7 +12,7 @@ import (
 	"github.com/vchain-us/kube-notary/pkg/image"
 )
 
-// ImageHash returns the hash string and the BlockchainVerification for the given imageID
+// ImageHash returns the hash string and the verification status for the given imageID
 func ImageHash(imageID string, options ...Option) (hash string, err error) {
 	o, err := makeOptions(options...)
 	if err != nil {

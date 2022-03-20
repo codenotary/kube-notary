@@ -1,19 +1,19 @@
 # kube-notary
-> A Kubernetes watchdog for verifying image trust with CodeNotary.
+> A Kubernetes watchdog for verifying image trust with Codenotary Cloud.
 
-<img src="https://raw.githubusercontent.com/vchain-us/kube-notary/master/docs/images/info.png" alt="CodeNotary for Kubernetes" width="800"/>
+<img src="https://raw.githubusercontent.com/vchain-us/kube-notary/master/docs/images/info.png" alt="Codenotary Cloud for Kubernetes" width="800"/>
 
 ## How it works
 
-**kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [CodeNotary Cloud](https://codenotary.com/products/ci-cd/).
+**kube-notary** is a monitoring tool for *Continuous Verification* (CV) via [Codenotary Cloud](https://codenotary.com/products/ci-cd/).
 The idea behind CV is to continuously monitor your cluster at runtime and be notified when unknown or untrusted container images are running.
 
 Once `kube-notary` is installed within your cluster, all pods are checked every minute (interval and other settings can be [configured](#Configuration)).
-For each of the running containers in each pod, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the [hash's signature in the CodeNotary's blockchain](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#signatures).
+For each of the running containers in each pod, `kube-notary` resolves the `ImageID` of the container's image to the actual image's hash and finally looks up the [hash's signature in the Codenotary's Cloud](https://github.com/vchain-us/vcn/blob/master/docs/user-guide/signatures.md#signatures).
 
 Furthermore, kube-notary provides a built-in exporter for sending verification [metrics](#Metrics) to Prometheus, which can then that can be easily visualized with the provided [grafana dashboard](grafana).
 
-Images you trust can be signed by using the CodeNotary vcn CLI tool.
+Images you trust can be signed by using the Codenotary vcn CLI tool.
 
 https://infograph.venngage.com/ps/ex4ECrROPCQ/codenotary-for-kubernetes
 
