@@ -171,7 +171,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		if w.cfg.LcHost() != "" && hash != "" {
 			hash = strings.TrimPrefix(hash, "sha256:")
 			// @TODO: Verify hash against CNCL, returns CNLC artifact (SBOM)
-			ar, err := api.PublicCNLCVerify(hash, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
+			ar, err := verify.PublicCNLCVerify(hash, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
 			metric := metrics.Metric{
 				Pod:             &pod,
 				ContainerStatus: &status,
