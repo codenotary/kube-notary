@@ -31,13 +31,15 @@ echo Signing...
 echo
 
 {{ range .Results -}}
-{{ if .Hash -}}
-vcn n --hash {{ .Hash }} --name "{{ if not .Containers -}}
-		sha256:{{ .Hash }}
+	{{ if .Hash -}}
+		vcn n --hash {{ .Hash }} --name "{{ if not .Containers -}}
+				sha256:{{ .Hash }}
+			{{- else -}}
+				{{ with index .Containers 0 }}{{ .Image }}{{ end }}
+			{{- end}}"
 	{{- else -}}
-		{{ with index .Containers 0 }}{{ .Image }}{{ end }}
-	{{- end}}"
-{{- end}}
+		vcn n image://{{ with index .Containers 0 }}{{ if not .ImageID -}}{{ .Image }}{{- else -}}{{ .ImageID }}{{- end}}{{ end }}
+	{{- end}}
 {{ end }}
 `
 

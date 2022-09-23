@@ -11,8 +11,9 @@ package watcher
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/vchain-us/kube-notary/pkg/verify"
 	"net/http"
+
+	"github.com/vchain-us/kube-notary/pkg/verify"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -67,7 +68,7 @@ func (w *watchdog) upsert(pod corev1.Pod, status corev1.ContainerStatus, v *veri
 	r, found := w.res[hash]
 	if !found {
 		r = Result{
-			Hash:       hash,
+			Hash:       hash, // @TODO: Here, think twice!
 			Containers: []ContainerInfo{},
 		}
 	}

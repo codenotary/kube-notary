@@ -11,12 +11,13 @@ package watcher
 import (
 	"context"
 	"fmt"
-	"github.com/codenotary/vcn-enterprise/pkg/api"
-	"github.com/codenotary/vcn-enterprise/pkg/meta"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/codenotary/vcn-enterprise/pkg/api"
+	"github.com/codenotary/vcn-enterprise/pkg/meta"
 
 	"github.com/vchain-us/kube-notary/pkg/config"
 	"github.com/vchain-us/kube-notary/pkg/image"
@@ -169,6 +170,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 
 		if w.cfg.LcHost() != "" && hash != "" {
 			hash = strings.TrimPrefix(hash, "sha256:")
+			// @TODO: Verify hash against CNCL, returns CNLC artifact (SBOM)
 			ar, err := api.PublicCNLCVerify(hash, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
 			metric := metrics.Metric{
 				Pod:             &pod,
@@ -178,13 +180,13 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			}
 			fields := metric.LogFields()
 			switch err {
-			case api.ErrNotVerified:
+			case api.ErrNotVerified: // @TODO: Not verified
 				v.Status = meta.StatusUnknown
 				v.Level = meta.LevelUnknown
 				v.Date = ""
 				v.Trusted = false
 				w.log.Warnf(`Image "%s" in pod "%s" is not verified: %s`, status.ImageID, pod.Name, err)
-			case api.ErrNotFound:
+			case api.ErrNotFound: // @TODO: Not found
 				v.Status = meta.StatusUnknown
 				v.Level = meta.LevelUnknown
 				v.Date = ""
@@ -198,7 +200,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 				if ar.Status == meta.StatusTrusted {
 					v.Trusted = true
 				}
-				w.log.WithFields(*fields).Info("Image is trusted")
+				w.log.WithFields(*fields).Info("Image is trusted") // @TODO: On ar.Status different from trusted it will be false trust positive
 			default:
 				v.Status = meta.StatusUnknown
 				v.Level = meta.LevelUnknown
