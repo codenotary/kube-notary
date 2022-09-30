@@ -16,14 +16,10 @@ help: ## Show this help.
 
 .PHONY: kube-notary
 kube-notary: ## Build kube-notary binary
-	$(GO) get github.com/rakyll/statik
-	GOOS=linux GOARCH=amd64 $(GO) generate ./pkg/status 
 	GOOS=linux GOARCH=amd64 $(GO) build $(TAGS) ./cmd/kube-notary
 
 .PHONY: kube-notary/debug
 kube-notary/debug: ## Build kube-notary not optimized binary (-gcflags='all=-N -l)
-	$(GO) get github.com/rakyll/statik
-	GOOS=linux GOARCH=amd64 $(GO) generate ./pkg/status $(TAGS)
 	GOOS=linux GOARCH=amd64 $(GO) build $(TAGS) -gcflags "all=-N -l" ./cmd/kube-notary
 
 .PHONY: image
