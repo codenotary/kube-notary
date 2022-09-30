@@ -36,7 +36,7 @@ type Interface interface {
 }
 
 type watchdog struct {
-	clientset *kubernetes.Clientset
+	clientSet *kubernetes.Clientset
 	log       *log.Logger
 	rec       metrics.Recorder
 	cfg       config.Interface
@@ -50,7 +50,7 @@ type watchdog struct {
 func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Recorder, logger *log.Logger) (Interface, error) {
 
 	if clientset == nil {
-		return nil, fmt.Errorf("clientset cannot be nil")
+		return nil, fmt.Errorf("clientSet cannot be nil")
 	}
 
 	if logger == nil {
@@ -58,7 +58,7 @@ func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Reco
 	}
 
 	return &watchdog{
-		clientset: clientset,
+		clientSet: clientset,
 		log:       logger,
 		rec:       rec,
 		cfg:       cfg,
@@ -71,7 +71,7 @@ func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Reco
 }
 
 func (w *watchdog) Run() {
-	clientset := w.clientset
+	clientset := w.clientSet
 	for {
 		w.log.SetLevel(w.cfg.LogLevel())
 
@@ -130,7 +130,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 	}
 
 	keychain, err := image.NewKeychain(
-		w.clientset,
+		w.clientSet,
 		pod.Namespace,
 		pod.Spec.ServiceAccountName,
 		pullSecrets,

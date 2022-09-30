@@ -1,8 +1,8 @@
 apiVersion: rbac.authorization.k8s.io/v1
-{{ if .Values.watch.namespace }}kind: Role{{ else }}kind: ClusterRole{{ end }}
+{{ if .Values.WATCH_NAMESPACE }}kind: Role{{ else }}kind: ClusterRole{{ end }}
 metadata:
-  name: {{ include "kube-notary.fullname" . }}{{ if .Values.watch.namespace }}
-  namespace: {{ .Values.watch.namespace }}{{ end }}
+  name: {{ include "kube-notary.fullname" . }}{{ if .Values.WATCH_NAMESPACE }}
+  namespace: {{ .Values.WATCH_NAMESPACE }}{{ end }}
   labels:
 {{ include "kube-notary.labels" . | indent 4 }}
 rules:

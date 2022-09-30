@@ -7,21 +7,21 @@ metadata:
 data:
   config.yaml: |-
     log:
-      level: {{ .Values.log.level }}
+      level: {{ .Values.LOG_LEVEL }}
     watch:
-      namespace: {{ .Values.watch.namespace }}
-      interval: {{ .Values.watch.interval }}
+      namespace: {{ .Values.WATCH_NAMESPACE }}
+      interval: {{ .Values.WATCH_INTERVAL }}
     trust:
-      org: {{ .Values.trust.org }}
+      org: {{ .Values.TRUST_ORG }}
       keys:
-        {{- range .Values.trust.keys }}
+        {{- range .Values.TRUST_KEYS }}
         - {{ . | quote }}
         {{- end }}
     cnc:
-      host: {{ .Values.cnc.host }}
-      port: {{ .Values.cnc.port }}
-      cert: {{ .Values.cnc.cert }}
-      noTls: {{ .Values.cnc.noTls }}
-      skipTlsVerify: {{ .Values.cnc.skipTlsVerify }}
-      crossLedgerKeyLedgerName: {{ .Values.cnc.crossLedgerKeyLedgerName }}
-      signerID: {{ .Values.cnc.signerID }}
+      host: {{ .Values.CNC_HOST }}
+      port: {{ .Values.CNC_PORT }}
+      cert: {{ .Values.CNC_CERT }}
+      noTls: {{ .Values.CNC_NO_TLS }}
+      skipTlsVerify: {{ .Values.CNC_SKIP_TLS_VERIFY }}
+      crossLedgerKeyLedgerName: {{ .Values.CNC_CROSS_LEDGER_KEY_LEDGER_NAME }}
+      signerID: {{ .Values.CNC_SIGNER_ID }}
