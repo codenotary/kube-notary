@@ -3,7 +3,7 @@
 # The full license information can be found under:
 # https://www.gnu.org/licenses/gpl-3.0.en.html
 
-FROM golang:1.15 as builder
+FROM golang:1.19 as builder
 WORKDIR /src
 
 RUN apt-get install --no-install-recommends -y openssh-client
