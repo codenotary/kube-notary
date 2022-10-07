@@ -30,6 +30,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+const kubeNotaryWatcherName = "kube-notary"
+
 type Interface interface {
 	Run()
 	ResultsHandler() http.Handler
@@ -71,6 +73,8 @@ func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Reco
 }
 
 func (w *watchdog) Run() {
+	log.Infof("WatchDog started on namespace %s interval %s LcHost %s Port %s LedgerName %s", w.cfg.Namespace(), w.cfg.Interval(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCrossLedgerKeyLedgerName())
+
 	clientSet := w.clientSet
 	for {
 		w.log.SetLevel(w.cfg.LogLevel())
@@ -106,6 +110,7 @@ func (w *watchdog) Run() {
 		if err != nil {
 			fields["error"] = true
 			w.log.WithFields(fields).Errorf("Error getting pods: %s", err)
+			// continue
 		} else {
 			fields["podCount"] = len(pods.Items)
 			w.log.WithFields(fields).Debug("Verification started")
@@ -123,6 +128,11 @@ func (w *watchdog) Run() {
 }
 
 func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
+
+	// skip K8s watcher container
+	if strings.Contains(pod.Name, kubeNotaryWatcherName) {
+		return
+	}
 
 	pullSecrets := make([]string, len(pod.Spec.ImagePullSecrets))
 	for i, localRef := range pod.Spec.ImagePullSecrets {
@@ -158,6 +168,8 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			opts...,
 		)
 
+		w.log.Debugf("Veryfy image name %s id %s hash %s", status.Image, status.ImageID, hash)
+
 		if err != nil {
 			errorList = append(errorList, err)
 			v.Status = meta.StatusUnknown
@@ -184,13 +196,13 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 				v.Level = meta.LevelUnknown
 				v.Date = ""
 				v.Trusted = false
-				w.log.Warnf(`Image "%s" in pod "%s" is not verified: %s`, status.ImageID, pod.Name, err)
+				w.log.Warnf("Image %s in pod %s is not verified: %s", status.ImageID, pod.Name, err)
 			case api.ErrNotFound:
 				v.Status = meta.StatusUnknown
 				v.Level = meta.LevelUnknown
 				v.Date = ""
 				v.Trusted = false
-				w.log.Warnf(`Image "%s" in pod "%s" not found: %s`, status.ImageID, pod.Name, err)
+				w.log.Warnf("Image %s in pod %s not found: %s", status.ImageID, pod.Name, err)
 			case nil:
 				v.Status = ar.Status
 				v.Level = meta.LevelCNLC
@@ -206,7 +218,7 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 				v.Date = ""
 				v.Trusted = false
 				errorList = append(errorList, err)
-				w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+				w.log.Errorf("Cannot verify %s in pod %s: %s", status.ImageID, pod.Name, err)
 			}
 			w.rec.Record(metric)
 

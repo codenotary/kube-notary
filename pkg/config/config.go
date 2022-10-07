@@ -13,18 +13,18 @@ import (
 
 // Configuration variables names
 const (
-	LogLevel                   = "LOG_LEVEL"
-	WatchNamespace             = "WATCH_NAMESPACE"
-	WatchInterval              = "WATCH_INTERVAL"
-	TrustKeys                  = "TRUST_KEYS"
-	TrustOrg                   = "TRUST_ORG"
-	LcHost                     = "CNC_HOST"
-	LcPort                     = "CNC_PORT"
-	LcCert                     = "CNC_CERT"
-	LcNoTls                    = "CNC_NO_TLS"
-	LcSkipTlsVerify            = "CNC_SKIP_TLS_VERIFY"
-	LcCrossLedgerKeyLedgerName = "CNC_LEDGER_NAME"
-	LcSignerID                 = "CNC_SIGNER_ID"
+	LogLevel                   = "log.level"
+	WatchNamespace             = "watch.namespace"
+	WatchInterval              = "watch.interval"
+	TrustKeys                  = "trust.keys"
+	TrustOrg                   = "trust.org"
+	LcHost                     = "cnc.host"
+	LcPort                     = "cnc.port"
+	LcCert                     = "cnc.cert"
+	LcNoTls                    = "cnc.noTls"
+	LcSkipTlsVerify            = "cnc.skipTlsVerify"
+	LcCrossLedgerKeyLedgerName = "cnc.ledgerName"
+	LcSignerID                 = "cnc.signerID"
 )
 
 const (
@@ -81,7 +81,7 @@ func New() (Interface, error) {
 	err := v.ReadInConfig()
 	// just use the default value(s) if the config file was not found
 	if _, ok := err.(*os.PathError); ok {
-		// logrus.Warnf("no config file '%s' not found. Using default values", defaultConfigPath)
+		log.Warnf("no config file '%s' not found. Using default values", defaultConfigPath)
 	} else if err != nil { // Handle other errors that occurred while reading the config file
 		return nil, fmt.Errorf("fatal error while reading the config file: %s", err)
 	}

@@ -30,7 +30,7 @@ kind load docker-image --name=$CLUSTER_NAME $KUBE_NOTARY_IMAGE
 kubectl create secret generic vcn-lc-api-key --from-literal=api-key=kube.izZQyDUfWnOSwSZefrOUThcVdbGBOouzKnHf
 
 # Install kube-notary chart
-# When debugging CNC on the same network(hostNetwork: true in deployment config) CNC_HOST need to be set to the docker bridge ip.
+# When debugging CNC on the same network(hostNetwork: true in deployment config) cnc.host need to be set to the docker bridge ip.
 # To retrieve it is possible to use:
 # docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}'
 # or
@@ -41,10 +41,10 @@ helm install \
     --set image.repository=kube-notary --set image.tag=debug\
     --set image.pullPolicy=Never \
     --set restartPolicy=Never \
-    --set CNC_PORT=3324 \
-    --set CNC_NO_TLS=true \
-    --set CNC_HOST=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}') \
-    --set WATCH_INTERVAL=10s \
+    --set cnc.port=3324 \
+    --set cnc.noTls=true \
+    --set cnc.host=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}') \
+    --set watch.interval=10s \
     --wait
 
 export SERVICE_NAME=service/kubeinstance-kube-notary

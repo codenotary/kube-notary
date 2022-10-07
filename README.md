@@ -41,13 +41,13 @@ helm install \
     -n kube-notary ../../helm/kube-notary \
     --set image.repository=$KUBE_NOTARY_IMAGE --set image.tag=$KUBE_NOTARY_TAG \
     --set image.pullPolicy=Always \
-    --set CNC_HOST={CNC ip address, default nil} \
-    --set CNC_PORT={CNC port address, default 3324} \
-    --set CNC_CERT={CNC certificate, default nil} \
-    --set CNC_NO_TLS={CNC enable unsecure connections, default true} \
-    --set CNC_SKIP_TLS_VERIFY={CNC skip tls verification, default false} \
-    --set CNC_SIGNER_ID={CNC parameter used to filter results on a specific signer ID, default nil} \
-    --set CNC_LEDGER_NAME={CNC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
+    --set cnc.host={CNC ip address, default nil} \
+    --set cnc.port={CNC port address, default 3324} \
+    --set cnc.cert={CNC certificate, default nil} \
+    --set cnc.noTls={CNC enable unsecure connections, default true} \
+    --set cnc.skipTlsVerify={CNC skip tls verification, default false} \
+    --set cnc.signerID={CNC parameter used to filter results on a specific signer ID, default nil} \
+    --set cnc.ledgerName={CNC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
     --wait
 ```
 
@@ -59,7 +59,7 @@ To sign an image use  vcn CLI. Please contact CodeNotary support for more inform
 
 If you do not have cluster-wide access, you can still install `kube-notary` within a single namespace, using:
 ```
-helm install -n kube-notary helm/kube-notary --set WATCH_NAMESPACE="default"
+helm install -n kube-notary helm/kube-notary --set watch.namespace="default"
 ```
 
 When so configured, a namespaced `Role` will be created instead of the default `ClusterRole` to accommodate Kubernetes [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) for a single namespace. `kube-notary` will get permission for, and will watch, the configured namespace only.
@@ -112,7 +112,7 @@ By default, `kube-notary` is installed into the current namespace (you can chang
 At install time you can change any values of [helm/kube-notary/values.yaml](helm/kube-notary/values.yaml) by using the Helm's `--set` option.
 For example, to instruct `kube-notary` to check only the `kube-system` namespace, just use:
 ```
-helm install -n kube-notary helm/kube-notary --set WATCH_NAMESPACE="kube-system"
+helm install -n kube-notary helm/kube-notary --set watch.namespace="kube-system"
 ```
 ### Runtime configuration
 

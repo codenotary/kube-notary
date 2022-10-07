@@ -42,7 +42,7 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /etc/kube-notary
-          {{- if .Values.CNC_HOST }}
+          {{- if .Values.cnc.host }}
           env:
             - name: VCN_LC_API_KEY
               valueFrom:

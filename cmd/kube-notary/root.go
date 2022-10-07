@@ -12,14 +12,13 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
-
 	"github.com/vchain-us/kube-notary/pkg/config"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
 	"github.com/vchain-us/kube-notary/pkg/status"
 	"github.com/vchain-us/kube-notary/pkg/watcher"
+	"k8s.io/client-go/rest"
 
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	//
 	// Uncomment to load all auth plugins
 	// _ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -37,6 +36,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(clusterCfg)
 	if err != nil {
@@ -47,10 +47,12 @@ func main() {
 	// creates the metrics recorder
 	recorder := metrics.NewRecorder()
 	// creates the watcher configuration
+
 	cfg, err := config.New()
 	if err != nil {
 		panic(err.Error())
 	}
+
 	// creates and run the watcher
 	w, err := watcher.New(clientset, cfg, recorder, logger)
 	if err != nil {

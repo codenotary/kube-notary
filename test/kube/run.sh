@@ -35,9 +35,9 @@ helm install \
     -n default kubeinstance ../../helm/kube-notary \
     --set image.repository=$KUBE_NOTARY_IMAGE --set image.tag=$KUBE_NOTARY_TAG \
     --set image.pullPolicy=Never \
-    --set CNC_PORT=3324 \
-    --set CNC_NO_TLS=true \
-    --set CNC_HOST=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}') \
+    --set cnc.port=3324 \
+    --set cnc.noTls=true \
+    --set cnc.host=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}') \
     --wait
 
 export SERVICE_NAME=service/kubeinstance-kube-notary
