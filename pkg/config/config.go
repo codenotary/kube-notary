@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-
 	"os"
 	"strings"
 	"time"
@@ -14,18 +13,18 @@ import (
 
 // Configuration variables names
 const (
-	LogLevel                   = "log.level"
-	WatchNamespace             = "watch.namespace"
-	WatchInterval              = "watch.interval"
-	TrustKeys                  = "trust.keys"
-	TrustOrg                   = "trust.org"
-	LcHost                     = "cnc.host"
-	LcPort                     = "cnc.port"
-	LcCert                     = "cnc.cert"
-	LcNoTls                    = "cnc.noTls"
-	LcSkipTlsVerify            = "cnc.skipTlsVerify"
-	LcCrossLedgerKeyLedgerName = "cnc.crossLedgerKeyLedgerName"
-	LcSignerID                 = "cnc.signerID"
+	LogLevel                   = "LOG_LEVEL"
+	WatchNamespace             = "WATCH_NAMESPACE"
+	WatchInterval              = "WATCH_INTERVAL"
+	TrustKeys                  = "TRUST_KEYS"
+	TrustOrg                   = "TRUST_ORG"
+	LcHost                     = "CNC_HOST"
+	LcPort                     = "CNC_PORT"
+	LcCert                     = "CNC_CERT"
+	LcNoTls                    = "CNC_NO_TLS"
+	LcSkipTlsVerify            = "CNC_SKIP_TLS_VERIFY"
+	LcCrossLedgerKeyLedgerName = "CNC_LEDGER_NAME"
+	LcSignerID                 = "CNC_SIGNER_ID"
 )
 
 const (
