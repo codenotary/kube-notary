@@ -12,16 +12,16 @@ data:
     log:
       level: debug
     watch:
-      namespace:
+      namespace: default
       interval: 60s
     trust:
       org:
       keys:
     cnc:
-      host:
+      host: 172.17.0.1
       port: 3324
       cert:
       noTls: true
       skipTlsVerify: false
-      crossLedgerKeyLedgerName:
-      signerID:
+      ledgerName: MyLedger
+      signerID: FooSignerID
