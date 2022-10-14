@@ -47,7 +47,6 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	// creates the logger
 
 	// creates the metrics recorder
 	recorder := metrics.NewRecorder()
