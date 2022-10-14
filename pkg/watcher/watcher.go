@@ -41,7 +41,7 @@ type watchdog struct {
 	clientSet *kubernetes.Clientset
 	log       *log.Logger
 	rec       metrics.Recorder
-	cfg       config.Interface
+	cfg       *config.Config
 	res       map[string]Result
 	tmp       []string
 	idx       []string
@@ -49,7 +49,7 @@ type watchdog struct {
 	mu        *sync.RWMutex
 }
 
-func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Recorder, logger *log.Logger) (Interface, error) {
+func New(clientset *kubernetes.Clientset, cfg *config.Config, rec metrics.Recorder, logger *log.Logger) (Interface, error) {
 
 	if clientset == nil {
 		return nil, fmt.Errorf("clientSet cannot be nil")
@@ -225,8 +225,8 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 				w.log.Errorf("Cannot verify %s in pod %s: %s", status.ImageID, pod.Name, err)
 			}
 			w.rec.Record(metric)
-
 		}
+
 		// update or insert the result into tmp list
 		w.upsert(pod, status, v, hash, errorList)
 	}

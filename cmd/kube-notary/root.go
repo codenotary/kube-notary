@@ -9,6 +9,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -29,7 +30,12 @@ import (
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 )
 
+const httpPort = 9581
+
 func main() {
+	logger := logrus.New()
+	logger.Infof("kube-notary watcher started, listening http calls on port %d", httpPort)
+
 	// creates the in-cluster config
 	clusterCfg, err := rest.InClusterConfig()
 	if err != nil {
@@ -42,7 +48,7 @@ func main() {
 		panic(err.Error())
 	}
 	// creates the logger
-	logger := logrus.New()
+
 	// creates the metrics recorder
 	recorder := metrics.NewRecorder()
 	// creates the watcher configuration
@@ -67,15 +73,14 @@ func main() {
 	// verification results.
 	http.Handle("/results", w.ResultsHandler())
 
-	// The status.Handler() provides a handler to expose embedded the status web page.
-
 	// Healthcheck endpoint.
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Write([]byte("ok"))
 	})
 
+	// The status.Handler() provides a handler to expose embedded the status web page.
 	http.Handle("/", status.Handler())
 
-	panic(http.ListenAndServe(":9581", nil))
+	panic(http.ListenAndServe(fmt.Sprintf(":%d", httpPort), nil))
 }

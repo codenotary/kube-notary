@@ -11,8 +11,9 @@ package watcher
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/vchain-us/kube-notary/pkg/verify"
 	"net/http"
+
+	"github.com/vchain-us/kube-notary/pkg/verify"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -33,6 +34,43 @@ type Result struct {
 	Containers   []ContainerInfo      `json:"containers"`
 	Verification *verify.Verification `json:"verification,omitempty"`
 	Errors       []string             `json:"errors,omitempty"`
+}
+
+// ResultsHandler returns an http.Handler to expose detailed verification results.
+func (w *watchdog) ResultsHandler() http.Handler {
+	ww := w
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ww.mu.RLock()
+		defer ww.mu.RUnlock()
+
+		// Make results
+		res := make([]Result, len(ww.idx))
+		for i, hash := range ww.idx {
+			res[i] = ww.res[hash]
+		}
+
+		if r.URL.Query().Get("output") == "bulk_sign" {
+			err := bulkSigningScript(w, res)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintln(w, err.Error())
+				return
+			}
+			return
+		}
+
+		b, err := json.Marshal(res)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintln(w, err.Error())
+			return
+		}
+
+		headers := w.Header()
+		headers.Set("Access-Control-Allow-Origin", "*")
+		headers.Set("Content-Type", "application/json")
+		w.Write(b)
+	})
 }
 
 func (w *watchdog) commit() {
@@ -102,41 +140,4 @@ func (w *watchdog) upsert(pod corev1.Pod, status corev1.ContainerStatus, v *veri
 	// mark hash as seen and save the result
 	w.seen[hash] = true
 	w.res[hash] = r
-}
-
-// ResultsHandler returns an http.Handler to expose detailed verification results.
-func (w *watchdog) ResultsHandler() http.Handler {
-	ww := w
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ww.mu.RLock()
-		defer ww.mu.RUnlock()
-
-		// Make results
-		res := make([]Result, len(ww.idx))
-		for i, hash := range ww.idx {
-			res[i] = ww.res[hash]
-		}
-
-		if r.URL.Query().Get("output") == "bulk_sign" {
-			err := bulkSigningScript(w, res)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprintln(w, err.Error())
-				return
-			}
-			return
-		}
-
-		b, err := json.Marshal(res)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintln(w, err.Error())
-			return
-		}
-
-		headers := w.Header()
-		headers.Set("Access-Control-Allow-Origin", "*")
-		headers.Set("Content-Type", "application/json")
-		w.Write(b)
-	})
 }
