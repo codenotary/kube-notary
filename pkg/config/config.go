@@ -60,7 +60,8 @@ func New() (*Config, error) {
 	v.AutomaticEnv()
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.SetTypeByDefaultValue(true)
-	v.SetConfigFile(defaultConfigPath)
+	//v.SetConfigFile(defaultConfigPath)
+	v.SetConfigFile("./config.yaml") // @TODO: recover or pass it as flag
 
 	// Find and read the config file
 	err := v.ReadInConfig()
@@ -70,9 +71,6 @@ func New() (*Config, error) {
 	} else if err != nil { // Handle other errors that occurred while reading the config file
 		return nil, fmt.Errorf("fatal error while reading the config file: %s", err)
 	}
-
-	// Monitor the changes in the config file
-	v.WatchConfig()
 
 	return c, nil
 
