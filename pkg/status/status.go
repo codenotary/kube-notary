@@ -18,5 +18,5 @@ var static embed.FS
 
 // Handler returns an http.Handler to expose the status page.
 func Handler() http.Handler {
-	return http.StripPrefix("/status/", http.FileServer(http.FS(static)))
+	return http.StripPrefix("/", http.FileServer(http.FS(static)))
 }
