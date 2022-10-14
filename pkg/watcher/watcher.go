@@ -163,6 +163,10 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		}
 		errorList := make([]error, 0)
 
+		if status.ImageID == "" {
+			continue
+		}
+
 		hash, err := verify.ImageHash(
 			status.ImageID,
 			opts...,
