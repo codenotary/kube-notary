@@ -25,10 +25,11 @@ const (
 	LcSkipTlsVerify            = "cnc.skipTlsVerify"
 	LcCrossLedgerKeyLedgerName = "cnc.ledgerName"
 	LcSignerID                 = "cnc.signerID"
+	InternalMode               = "internal"
 )
 
 const (
-	defaultConfigPath = "/etc/kube-notary/config.yaml" // defined with mountPath in deployment.yaml by kubernetes
+	DefaultConfigPath = "/etc/kube-notary/config.yaml" // defined with mountPath in deployment.yaml by kubernetes
 )
 
 // Config populates required config values
@@ -37,7 +38,7 @@ type Config struct {
 }
 
 // New returns a kube-notary configuration instance
-func New() (*Config, error) {
+func New(filePath string) (*Config, error) {
 	v := viper.New()
 	c := &Config{
 		v: v,
@@ -60,13 +61,13 @@ func New() (*Config, error) {
 	v.AutomaticEnv()
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.SetTypeByDefaultValue(true)
-	v.SetConfigFile(defaultConfigPath)
+	v.SetConfigFile(filePath)
 
 	// Find and read the config file
 	err := v.ReadInConfig()
 	// just use the default value(s) if the config file was not found
 	if _, ok := err.(*os.PathError); ok {
-		log.Warnf("no config file '%s' not found. Using default values", defaultConfigPath)
+		log.Warnf("no config file '%s' not found. Using default values", DefaultConfigPath)
 	} else if err != nil { // Handle other errors that occurred while reading the config file
 		return nil, fmt.Errorf("fatal error while reading the config file: %s", err)
 	}

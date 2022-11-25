@@ -9,8 +9,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/vchain-us/kube-notary/pkg/config"
@@ -19,6 +21,7 @@ import (
 	"github.com/vchain-us/kube-notary/pkg/watcher"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	//
 	// Uncomment to load all auth plugins
 	// _ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -33,18 +36,36 @@ import (
 const httpPort = 9581
 
 func main() {
-	cfg, err := config.New()
+	configFilePath := flag.String("config", config.DefaultConfigPath, "config file path")
+	mode := flag.String("k8s-mode", config.InternalMode, "kubernetes controller mode, external runs out of the cluster (development mode")
+	flag.Parse()
+
+	cfg, err := config.New(*configFilePath)
 	if err != nil {
 		log.Fatalf("unable to load config, error %v", err)
 	}
 
 	log.Infof("kube-notary watcher started on namespace %s with watch interval %s, listening http calls on port %d", cfg.Namespace(), cfg.Interval(), httpPort)
 
-	clusterCfg, err := rest.InClusterConfig()
+	if *mode == config.InternalMode {
+		clusterCfg, err := rest.InClusterConfig()
+		if err != nil {
+			log.Fatalf("unable to get cluster config from flags, error %v", err)
+		}
+		run(cfg, clusterCfg)
+		return
+	}
+
+	kubeConfigPath := os.Getenv("HOME") + "/.kube/config"
+	clusterCfg, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 	if err != nil {
 		log.Fatalf("unable to get cluster config from flags, error %v", err)
 	}
 
+	run(cfg, clusterCfg)
+}
+
+func run(cfg *config.Config, clusterCfg *rest.Config) {
 	clientSet, err := kubernetes.NewForConfig(clusterCfg)
 	if err != nil {
 		log.Fatalf("unable to create kubernetes client, error %v", err)
