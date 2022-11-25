@@ -11,7 +11,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/vchain-us/kube-notary/pkg/config"
@@ -19,7 +18,7 @@ import (
 	"github.com/vchain-us/kube-notary/pkg/status"
 	"github.com/vchain-us/kube-notary/pkg/watcher"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/rest"
 	//
 	// Uncomment to load all auth plugins
 	// _ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -41,13 +40,7 @@ func main() {
 
 	log.Infof("kube-notary watcher started on namespace %s with watch interval %s, listening http calls on port %d", cfg.Namespace(), cfg.Interval(), httpPort)
 
-	//clusterCfg, err := rest.InClusterConfig()
-	//if err != nil {
-	//	panic(err.Error())
-	//}
-	kubeConfigPath := os.Getenv("HOME") + "/.kube/config" // @TODO: Provisional, remove it!
-
-	clusterCfg, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
+	clusterCfg, err := rest.InClusterConfig()
 	if err != nil {
 		log.Fatalf("unable to get cluster config from flags, error %v", err)
 	}
