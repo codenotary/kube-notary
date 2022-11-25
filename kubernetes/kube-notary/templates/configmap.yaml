@@ -12,13 +12,13 @@ data:
     log:
       level: debug
     watch:
-      namespace: default
+      namespace:
       interval: 60s
     trust:
       org:
       keys:
     cnc:
-      host: 172.17.0.1
+      host:
       port: 3324
       cert:
       noTls: true

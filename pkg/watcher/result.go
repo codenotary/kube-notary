@@ -37,7 +37,7 @@ type Result struct {
 }
 
 // ResultsHandler returns an http.Handler to expose detailed verification results.
-func (w *watchdog) ResultsHandler() http.Handler {
+func (w *WatchDog) ResultsHandler() http.Handler {
 	ww := w
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ww.mu.RLock()
@@ -53,7 +53,7 @@ func (w *watchdog) ResultsHandler() http.Handler {
 			err := bulkSigningScript(w, res)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprintln(w, err.Error())
+				_, _ = fmt.Fprintln(w, err.Error())
 				return
 			}
 			return
@@ -62,18 +62,18 @@ func (w *watchdog) ResultsHandler() http.Handler {
 		b, err := json.Marshal(res)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintln(w, err.Error())
+			_, _ = fmt.Fprintln(w, err.Error())
 			return
 		}
 
 		headers := w.Header()
 		headers.Set("Access-Control-Allow-Origin", "*")
 		headers.Set("Content-Type", "application/json")
-		w.Write(b)
+		_, _ = w.Write(b)
 	})
 }
 
-func (w *watchdog) commit() {
+func (w *WatchDog) commit() {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
@@ -87,13 +87,12 @@ func (w *watchdog) commit() {
 		}
 	}
 
-	// commit index
 	w.idx = make([]string, len(w.tmp))
 	copy(w.idx, w.tmp)
 	w.tmp = []string{}
 }
 
-func (w *watchdog) upsert(pod corev1.Pod, status corev1.ContainerStatus, v *verify.Verification, hash string, errs []error) {
+func (w *WatchDog) upsert(pod corev1.Pod, status corev1.ContainerStatus, v *verify.Verification, hash string, errs []error) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
@@ -101,7 +100,6 @@ func (w *watchdog) upsert(pod corev1.Pod, status corev1.ContainerStatus, v *veri
 		w.tmp = append(w.tmp, hash)
 	}
 
-	// check if already present, otherwise create a new Result
 	r, found := w.res[hash]
 	if !found {
 		r = Result{
@@ -110,7 +108,6 @@ func (w *watchdog) upsert(pod corev1.Pod, status corev1.ContainerStatus, v *veri
 		}
 	}
 
-	// update verification
 	r.Verification = v
 
 	// update errors
