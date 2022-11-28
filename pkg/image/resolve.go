@@ -59,23 +59,23 @@ func configDigest(imageRef string, keychain authn.Keychain) (string, error) {
 // for an overiew about image ids and references.
 //
 // Supported formats:
-//  - Local OCI image id (pre-pulled, `sha256:` prefix)
-//  - Local docker image id (pre-pulled, `docker://sha256:` prefix)
-//  - OCI pullable image reference
-//  - Docker pullable image reference (prefix `docker-pullable://`)
+//   - Local OCI image id (pre-pulled, `sha256:` prefix)
+//   - Local docker image id (pre-pulled, `docker://sha256:` prefix)
+//   - OCI pullable image reference
+//   - Docker pullable image reference (prefix `docker-pullable://`)
 //
 // Resolution strategy:
-//  - Pre-pulled images are resolved directly (digest is the actual image id already)
-//  - For pullable image references, the manifest is fetched from the respective registry
-//    using the auth keychain if needed. If manifest was a list, the image matching the
-//    current platform will be chosen. Finally, the config digest is returned.
+//   - Pre-pulled images are resolved directly (digest is the actual image id already)
+//   - For pullable image references, the manifest is fetched from the respective registry
+//     using the auth keychain if needed. If manifest was a list, the image matching the
+//     current platform will be chosen. Finally, the config digest is returned.
 //
 // Note:
-//  - only sha256 digests are supported
-//  - Docker Manifest v2 Schema 1 is deprecated and not supported anymore, see:
-//  - https://docs.docker.com/engine/deprecated/#pushing-and-pulling-with-image-manifest-v2-schema-1
-//    https://github.com/google/go-containerregistry/blob/master/pkg/v1/remote/descriptor.go#L111
-//    https://github.com/google/go-containerregistry/issues/377
+//   - only sha256 digests are supported
+//   - Docker Manifest v2 Schema 1 is deprecated and not supported anymore, see:
+//   - https://docs.docker.com/engine/deprecated/#pushing-and-pulling-with-image-manifest-v2-schema-1
+//     https://github.com/google/go-containerregistry/blob/master/pkg/v1/remote/descriptor.go#L111
+//     https://github.com/google/go-containerregistry/issues/377
 func Resolve(imageID string, keychain authn.Keychain) (string, error) {
 	// Docker pre-pulled image
 	if strings.HasPrefix(imageID, DockerImageIDPrefix+SHA256DigestPrefix) {
@@ -86,14 +86,14 @@ func Resolve(imageID string, keychain authn.Keychain) (string, error) {
 		return imageID, nil
 	}
 
-	// Pullable image
-	if strings.Contains(imageID, "@"+SHA256DigestPrefix) {
-		ref := imageID
-		if strings.HasPrefix(imageID, DockerPullableImageIDPrefix) {
-			ref = strings.TrimPrefix(imageID, DockerPullableImageIDPrefix)
-		}
-		return configDigest(ref, keychain)
+	if !strings.Contains(imageID, "@"+SHA256DigestPrefix) {
+		return "", fmt.Errorf("unsupported image format: %s", imageID)
 	}
 
-	return "", fmt.Errorf("unsupported image format: %s", imageID)
+	// Pullable image
+	ref := imageID
+	if strings.HasPrefix(imageID, DockerPullableImageIDPrefix) {
+		ref = strings.TrimPrefix(imageID, DockerPullableImageIDPrefix)
+	}
+	return configDigest(ref, keychain)
 }

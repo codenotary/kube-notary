@@ -1,0 +1,16 @@
+log:
+  level: debug
+watch:
+  namespace: default
+  interval: 10s
+trust:
+  org:
+  keys:
+cnc:
+  host: localhost
+  port: 3324
+  cert:
+  noTls: true
+  skipTlsVerify: false
+  ledgerName: ledger1
+  signerID: signer1.IFQzlOl8lq8EVcowj2l1jw

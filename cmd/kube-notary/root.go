@@ -9,17 +9,19 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"net/http"
+	"os"
 
-	"github.com/sirupsen/logrus"
-
+	log "github.com/sirupsen/logrus"
 	"github.com/vchain-us/kube-notary/pkg/config"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
 	"github.com/vchain-us/kube-notary/pkg/status"
 	"github.com/vchain-us/kube-notary/pkg/watcher"
-
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	//
 	// Uncomment to load all auth plugins
 	// _ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -31,49 +33,53 @@ import (
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 )
 
+const httpPort = 9581
+
 func main() {
-	// creates the in-cluster config
-	clusterCfg, err := rest.InClusterConfig()
+	configFilePath := flag.String("config", config.DefaultConfigPath, "config file path")
+	mode := flag.String("k8s-mode", config.InternalMode, "kubernetes controller mode, external runs out of the cluster (development mode")
+	flag.Parse()
+
+	cfg, err := config.New(*configFilePath)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("unable to load config, error %v", err)
 	}
-	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(clusterCfg)
+
+	log.Infof("kube-notary watcher started on namespace %s with watch interval %s, listening http calls on port %d", cfg.Namespace(), cfg.Interval(), httpPort)
+
+	if *mode == config.InternalMode {
+		clusterCfg, err := rest.InClusterConfig()
+		if err != nil {
+			log.Fatalf("unable to get cluster config from flags, error %v", err)
+		}
+		run(cfg, clusterCfg)
+		return
+	}
+
+	kubeConfigPath := os.Getenv("HOME") + "/.kube/config"
+	clusterCfg, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("unable to get cluster config from flags, error %v", err)
 	}
-	// creates the logger
-	logger := logrus.New()
-	// creates the metrics recorder
-	recorder := metrics.NewRecorder()
-	// creates the watcher configuration
-	cfg, err := config.New()
+
+	run(cfg, clusterCfg)
+}
+
+func run(cfg *config.Config, clusterCfg *rest.Config) {
+	clientSet, err := kubernetes.NewForConfig(clusterCfg)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("unable to create kubernetes client, error %v", err)
 	}
-	// creates and run the watcher
-	w, err := watcher.New(clientset, cfg, recorder, logger)
-	if err != nil {
-		panic(err.Error())
-	}
+
+	w := watcher.New(clientSet, cfg, metrics.NewRecorder())
 	go w.Run()
 
-	// The metrics.Handler provides a default handler to expose metrics
-	// via an HTTP server. "/metrics" is the usual endpoint for that.
 	http.Handle("/metrics", metrics.Handler())
-
-	// The w.ResultsHandler provides a handler to expose detailed
-	// verification results.
 	http.Handle("/results", w.ResultsHandler())
-
-	// The status.Handler() provides a handler to expose embedded the status web page.
-	http.Handle("/status/", status.Handler())
-
-	// Healthcheck endpoint.
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Write([]byte("ok"))
+		_, _ = w.Write([]byte("ok"))
 	})
+	http.Handle("/", status.Handler())
 
-	panic(http.ListenAndServe(":9581", nil))
+	panic(http.ListenAndServe(fmt.Sprintf(":%d", httpPort), nil))
 }

@@ -47,7 +47,7 @@ helm install \
     --set cnc.noTls={CNC enable unsecure connections, default true} \
     --set cnc.skipTlsVerify={CNC skip tls verification, default false} \
     --set cnc.signerID={CNC parameter used to filter results on a specific signer ID, default nil} \
-    --set cnc.crossLedgerKeyLedgerName={CNC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
+    --set cnc.ledgerName={CNC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
     --wait
 ```
 

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fake-server-deployment
+spec:
+  selector:
+    matchLabels:
+      app: fake-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fake-server
+    spec:
+      containers:
+        - name: fake-server
+          image: localhost:5000/fake-server:0.1
+          ports:
+            - containerPort: 80

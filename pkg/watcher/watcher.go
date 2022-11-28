@@ -10,14 +10,16 @@ package watcher
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/codenotary/vcn-enterprise/pkg/api"
-	"github.com/codenotary/vcn-enterprise/pkg/meta"
-	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/codenotary/vcn-enterprise/pkg/api"
+	"github.com/codenotary/vcn-enterprise/pkg/meta"
+	"github.com/codenotary/vcn-enterprise/pkg/store"
 	"github.com/vchain-us/kube-notary/pkg/config"
 	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
@@ -29,16 +31,12 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-type Interface interface {
-	Run()
-	ResultsHandler() http.Handler
-}
+const kubeNotaryWatcherName = "kube-notary"
 
-type watchdog struct {
-	clientset *kubernetes.Clientset
-	log       *log.Logger
+type WatchDog struct {
+	clientSet *kubernetes.Clientset
 	rec       metrics.Recorder
-	cfg       config.Interface
+	cfg       *config.Config
 	res       map[string]Result
 	tmp       []string
 	idx       []string
@@ -46,19 +44,9 @@ type watchdog struct {
 	mu        *sync.RWMutex
 }
 
-func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Recorder, logger *log.Logger) (Interface, error) {
-
-	if clientset == nil {
-		return nil, fmt.Errorf("clientset cannot be nil")
-	}
-
-	if logger == nil {
-		logger = log.StandardLogger()
-	}
-
-	return &watchdog{
-		clientset: clientset,
-		log:       logger,
+func New(clientSet *kubernetes.Clientset, cfg *config.Config, rec metrics.Recorder) *WatchDog {
+	return &WatchDog{
+		clientSet: clientSet,
 		rec:       rec,
 		cfg:       cfg,
 		res:       map[string]Result{},
@@ -66,33 +54,21 @@ func New(clientset *kubernetes.Clientset, cfg config.Interface, rec metrics.Reco
 		idx:       []string{},
 		seen:      map[string]bool{},
 		mu:        &sync.RWMutex{},
-	}, nil
+	}
 }
 
-func (w *watchdog) Run() {
-	clientset := w.clientset
+func (w *WatchDog) Run() {
+	log.Infof("WatchDog started on namespace %s interval %s LcHost %s Port %s LedgerName %s", w.cfg.Namespace(), w.cfg.Interval(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCrossLedgerKeyLedgerName())
+
+	keys := w.cfg.TrustedKeys()
+	org := w.cfg.TrustedOrg()
+
 	for {
-		w.log.SetLevel(w.cfg.LogLevel())
-
-		ns := w.cfg.Namespace()
-		sleep := w.cfg.Interval()
-		keys := w.cfg.TrustedKeys()
-		org := w.cfg.TrustedOrg()
-		fields := log.Fields{
-			config.LogLevel:       w.cfg.LogLevel().String(),
-			config.WatchNamespace: ns,
-			config.WatchInterval:  sleep,
-			config.TrustKeys:      keys,
-		}
-
 		var opt verify.Option
-
 		if org != "" {
-			delete(fields, config.TrustKeys)
-			fields[config.TrustOrg] = org
 			opt = verify.WithSignerOrg(org)
 			if len(keys) > 0 {
-				w.log.WithFields(fields).Warn("Trusted keys ignored because an organization is set")
+				log.Warn("Trusted keys ignored because an organization is set")
 				keys = nil
 			}
 		} else if len(keys) > 0 {
@@ -101,27 +77,27 @@ func (w *watchdog) Run() {
 
 		w.rec.Reset()
 
-		pods, err := clientset.CoreV1().Pods(ns).List(context.Background(), metav1.ListOptions{})
+		pods, err := w.clientSet.CoreV1().Pods(w.cfg.Namespace()).List(context.Background(), metav1.ListOptions{})
 		if err != nil {
-			fields["error"] = true
-			w.log.WithFields(fields).Errorf("Error getting pods: %s", err)
-		} else {
-			fields["podCount"] = len(pods.Items)
-			w.log.WithFields(fields).Debug("Verification started")
-
-			for _, pod := range pods.Items {
-				w.watchPod(pod, opt)
-			}
+			log.Errorf("Error getting pods: %s", err)
+			continue
 		}
 
-		// commit tmp list into results index
+		for _, pod := range pods.Items {
+			w.watchPod(pod, opt)
+		}
+
 		w.commit()
-		w.log.Debugf("Sleeping for %s", sleep)
-		time.Sleep(sleep)
+		time.Sleep(w.cfg.Interval())
 	}
 }
 
-func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
+func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
+
+	// skip K8s watcher container
+	if strings.Contains(pod.Name, kubeNotaryWatcherName) {
+		return
+	}
 
 	pullSecrets := make([]string, len(pod.Spec.ImagePullSecrets))
 	for i, localRef := range pod.Spec.ImagePullSecrets {
@@ -129,13 +105,13 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 	}
 
 	keychain, err := image.NewKeychain(
-		w.clientset,
+		w.clientSet,
 		pod.Namespace,
 		pod.Spec.ServiceAccountName,
 		pullSecrets,
 	)
 	if err != nil {
-		w.log.Warnf(`Keychain error in pod "%s": %s`, pod.Name, err)
+		log.Warnf(`Keychain error in pod "%s": %s`, pod.Name, err)
 	}
 
 	// make options
@@ -148,14 +124,20 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		v := &verify.Verification{}
 
 		if status.State.Running == nil {
-			w.log.Infof(`Container "%s" in pod "%s" is not running: skipped`, status.Name, pod.Name)
+			log.Infof(`Container "%s" in pod "%s" is not running: skipped`, status.Name, pod.Name)
 		}
 		errorList := make([]error, 0)
+
+		if status.ImageID == "" {
+			continue
+		}
 
 		hash, err := verify.ImageHash(
 			status.ImageID,
 			opts...,
 		)
+
+		log.Debugf("Veryfy image name %s id %s hash %s", status.Image, status.ImageID, hash)
 
 		if err != nil {
 			errorList = append(errorList, err)
@@ -164,32 +146,28 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			v.Date = ""
 			v.Trusted = false
 			errorList = append(errorList, err)
-			w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+			log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
 		}
 
+		// @TODO: w.cfg.LcHost() == "" move to app init
+		if hash == "" {
+			continue
+		}
 		if w.cfg.LcHost() != "" && hash != "" {
-			hash = strings.TrimPrefix(hash, "sha256:")
-			ar, err := api.PublicCNLCVerify(hash, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
-			metric := metrics.Metric{
-				Pod:             &pod,
-				ContainerStatus: &status,
-				Verification:    v,
-				Hash:            hash,
-			}
-			fields := metric.LogFields()
+			ar, err := VerifyArtifact(hash, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
 			switch err {
 			case api.ErrNotVerified:
 				v.Status = meta.StatusUnknown
 				v.Level = meta.LevelUnknown
 				v.Date = ""
 				v.Trusted = false
-				w.log.Warnf(`Image "%s" in pod "%s" is not verified: %s`, status.ImageID, pod.Name, err)
+				log.Warnf("Image %s in pod %s is not verified: %s", status.ImageID, pod.Name, err)
 			case api.ErrNotFound:
 				v.Status = meta.StatusUnknown
 				v.Level = meta.LevelUnknown
 				v.Date = ""
 				v.Trusted = false
-				w.log.Warnf(`Image "%s" in pod "%s" not found: %s`, status.ImageID, pod.Name, err)
+				log.Warnf("Image %s in pod %s not found: %s", status.ImageID, pod.Name, err)
 			case nil:
 				v.Status = ar.Status
 				v.Level = meta.LevelCNLC
@@ -198,19 +176,47 @@ func (w *watchdog) watchPod(pod corev1.Pod, options ...verify.Option) {
 				if ar.Status == meta.StatusTrusted {
 					v.Trusted = true
 				}
-				w.log.WithFields(*fields).Info("Image is trusted")
+				log.Infof("Image %s with ID %s is trusted", status.Image, status.ImageID)
 			default:
 				v.Status = meta.StatusUnknown
 				v.Level = meta.LevelUnknown
 				v.Date = ""
 				v.Trusted = false
 				errorList = append(errorList, err)
-				w.log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+				log.Errorf("Cannot verify %s in pod %s: %s", status.ImageID, pod.Name, err)
 			}
-			w.rec.Record(metric)
-
+			w.rec.Record(metrics.Metric{
+				Pod:             &pod,
+				ContainerStatus: &status,
+				Verification:    v,
+				Hash:            hash,
+			})
 		}
+
 		// update or insert the result into tmp list
 		w.upsert(pod, status, v, hash, errorList)
 	}
+}
+
+func VerifyArtifact(hash, lcLedger, signerID, lcHost, lcPort, lcCert string, lcSkipTlsVerify, lcNoTls bool) (a *api.LcArtifact, err error) {
+	// @TODO: Move it to app boot
+	apiKey := os.Getenv(meta.VcnLcApiKey)
+	if apiKey == "" {
+		return nil, errors.New("no api key found")
+	}
+
+	_ = store.LoadConfig()
+	cl, err := api.GetOrCreateLcUser(apiKey, "", lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls, nil, true)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create vcn client, error %w", err)
+	}
+
+	hash = strings.TrimPrefix(hash, "sha256:")
+	metadata := map[string][]string{meta.VcnLCCmdHeaderName: {meta.VcnLCVerifyCmdHeaderValue}}
+	a, _, err = cl.LoadArtifact(hash, signerID, "", 0, metadata)
+	if err != nil {
+		return nil, fmt.Errorf("unable to load artifact, error %w", err)
+	}
+
+	return a, err
 }

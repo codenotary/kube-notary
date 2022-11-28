@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-
 	"os"
 	"strings"
 	"time"
@@ -24,38 +23,24 @@ const (
 	LcCert                     = "cnc.cert"
 	LcNoTls                    = "cnc.noTls"
 	LcSkipTlsVerify            = "cnc.skipTlsVerify"
-	LcCrossLedgerKeyLedgerName = "cnc.crossLedgerKeyLedgerName"
+	LcCrossLedgerKeyLedgerName = "cnc.ledgerName"
 	LcSignerID                 = "cnc.signerID"
+	InternalMode               = "internal"
 )
 
 const (
-	defaultConfigPath = "/etc/kube-notary/config.yaml" // defined with mountPath in deployment.yaml by kubernetes
+	DefaultConfigPath = "/etc/kube-notary/config.yaml" // defined with mountPath in deployment.yaml by kubernetes
 )
 
-// Interface is the kube-notary configuration
-type Interface interface {
-	LogLevel() log.Level
-	Namespace() string
-	Interval() time.Duration
-	TrustedKeys() []string
-	TrustedOrg() string
-	LcHost() string
-	LcPort() string
-	LcCert() string
-	LcSkipTlsVerify() bool
-	LcNoTls() bool
-	LcCrossLedgerKeyLedgerName() string
-	LcSignerID() string
-}
-
-type cfg struct {
+// Config populates required config values
+type Config struct {
 	v *viper.Viper
 }
 
 // New returns a kube-notary configuration instance
-func New() (Interface, error) {
+func New(filePath string) (*Config, error) {
 	v := viper.New()
-	c := &cfg{
+	c := &Config{
 		v: v,
 	}
 
@@ -76,13 +61,13 @@ func New() (Interface, error) {
 	v.AutomaticEnv()
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.SetTypeByDefaultValue(true)
-	v.SetConfigFile(defaultConfigPath)
+	v.SetConfigFile(filePath)
 
 	// Find and read the config file
 	err := v.ReadInConfig()
 	// just use the default value(s) if the config file was not found
 	if _, ok := err.(*os.PathError); ok {
-		// logrus.Warnf("no config file '%s' not found. Using default values", defaultConfigPath)
+		log.Warnf("no config file '%s' not found. Using default values", DefaultConfigPath)
 	} else if err != nil { // Handle other errors that occurred while reading the config file
 		return nil, fmt.Errorf("fatal error while reading the config file: %s", err)
 	}
@@ -95,7 +80,7 @@ func New() (Interface, error) {
 }
 
 // LogLevel returns the log level
-func (c cfg) LogLevel() log.Level {
+func (c *Config) LogLevel() log.Level {
 	logLevel := c.v.GetString(LogLevel)
 	l, err := log.ParseLevel(logLevel)
 	if err != nil {
@@ -105,56 +90,56 @@ func (c cfg) LogLevel() log.Level {
 }
 
 // Namespace returns the namespace selector string
-func (c cfg) Namespace() string {
+func (c *Config) Namespace() string {
 	return c.v.GetString(WatchNamespace)
 }
 
 // Interval returns the watching cycle interval as time.Duration
-func (c cfg) Interval() time.Duration {
+func (c *Config) Interval() time.Duration {
 	return c.v.GetDuration(WatchInterval)
 }
 
 // TrustedKeys returns the trusted keys list as a slice of strings
-func (c cfg) TrustedKeys() []string {
+func (c *Config) TrustedKeys() []string {
 	return c.v.GetStringSlice(TrustKeys)
 }
 
 // TrustedOrg returns the trusted organization ID as string
-func (c cfg) TrustedOrg() string {
+func (c *Config) TrustedOrg() string {
 	return c.v.GetString(TrustOrg)
 }
 
 // LcHost returns CNC connection host as a string
-func (c cfg) LcHost() string {
+func (c *Config) LcHost() string {
 	return c.v.GetString(LcHost)
 }
 
-// LcCert returns CNC connection port as a string
-func (c cfg) LcPort() string {
+// LcPort returns CNC connection port as a string
+func (c *Config) LcPort() string {
 	return c.v.GetString(LcPort)
 }
 
 // LcCert returns CNC connection certificate as a string
-func (c cfg) LcCert() string {
+func (c *Config) LcCert() string {
 	return c.v.GetString(LcCert)
 }
 
 // LcSkipTlsVerify returns the CNC LcSkipTlsVerify connection property as a bool
-func (c cfg) LcSkipTlsVerify() bool {
+func (c *Config) LcSkipTlsVerify() bool {
 	return c.v.GetBool(LcSkipTlsVerify)
 }
 
 // LcNoTls returns the CNC no tls connection property as a bool
-func (c cfg) LcNoTls() bool {
+func (c *Config) LcNoTls() bool {
 	return c.v.GetBool(LcNoTls)
 }
 
 // LcCrossLedgerKeyLedgerName parameter is used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Empty string is possible
-func (c cfg) LcCrossLedgerKeyLedgerName() string {
+func (c *Config) LcCrossLedgerKeyLedgerName() string {
 	return c.v.GetString(LcCrossLedgerKeyLedgerName)
 }
 
 // LcSignerID parameter is used to filter result on a specific signer ID.
-func (c cfg) LcSignerID() string {
+func (c *Config) LcSignerID() string {
 	return c.v.GetString(LcSignerID)
 }

@@ -23,5 +23,5 @@ data:
       cert: {{ .Values.cnc.cert }}
       noTls: {{ .Values.cnc.noTls }}
       skipTlsVerify: {{ .Values.cnc.skipTlsVerify }}
-      crossLedgerKeyLedgerName: {{ .Values.cnc.crossLedgerKeyLedgerName }}
+      crossLedgerKeyLedgerName: {{ .Values.cnc.ledgerName }}
       signerID: {{ .Values.cnc.signerID }}
