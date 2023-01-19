@@ -10,16 +10,13 @@ package watcher
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"os"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/codenotary/vcn-enterprise/pkg/api"
 	"github.com/codenotary/vcn-enterprise/pkg/meta"
-	"github.com/codenotary/vcn-enterprise/pkg/store"
 	"github.com/vchain-us/kube-notary/pkg/config"
 	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
@@ -154,7 +151,12 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			continue
 		}
 		if w.cfg.LcHost() != "" && hash != "" {
-			ar, err := VerifyArtifact(hash, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
+			apiKey, apiKeyErr := w.cfg.ApiKey() // @TODO: To init App
+			if apiKeyErr != nil {
+				log.Warnf("Unable to get Api Key from config, error: %v", apiKeyErr)
+				return
+			}
+			ar, err := VerifyArtifact(hash, apiKey, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
 			switch err {
 			case api.ErrNotVerified:
 				v.Status = meta.StatusUnknown
@@ -198,17 +200,13 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
 	}
 }
 
-func VerifyArtifact(hash, lcLedger, signerID, lcHost, lcPort, lcCert string, lcSkipTlsVerify, lcNoTls bool) (a *api.LcArtifact, err error) {
-	// @TODO: Move it to app boot
-	apiKey := os.Getenv(meta.VcnLcApiKey)
-	if apiKey == "" {
-		return nil, errors.New("no api key found")
-	}
+func VerifyArtifact(hash, apiKey, lcLedger, signerID, lcHost, lcPort, lcCert string, lcSkipTlsVerify, lcNoTls bool) (a *api.LcArtifact, err error) {
 
-	_ = store.LoadConfig()
-	cl, err := api.GetOrCreateLcUser(apiKey, "", lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls, nil, true)
+	log.Printf("VerifyArtifact apiKey %s ledger %s host %s port %s cert %s skip %v noTls %v \n", apiKey, lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls)
+
+	cl, err := buildClient(apiKey, lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create vcn client, error %w", err)
+		return nil, fmt.Errorf("unable to build client, error %w", err)
 	}
 
 	hash = strings.TrimPrefix(hash, "sha256:")
@@ -219,4 +217,17 @@ func VerifyArtifact(hash, lcLedger, signerID, lcHost, lcPort, lcCert string, lcS
 	}
 
 	return a, err
+}
+
+func buildClient(apiKey, lcLedger, lcHost, lcPort, lcCert string, lcSkipTlsVerify, lcNoTls bool) (*api.LcUser, error) {
+	client, err := api.NewLcClient(apiKey, lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls, nil, 0, 0)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create DataService client, error %w", err)
+	}
+	if err := client.Connect(); err != nil {
+		return nil, fmt.Errorf("unable to connect dataService, error %w", err)
+	}
+	return &api.LcUser{
+		Client: client,
+	}, nil
 }
