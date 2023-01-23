@@ -90,7 +90,8 @@ func (w *WatchDog) Run() {
 }
 
 func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
-	log.Printf("Watching")
+	log.Infof("Processing Pod %s:%s", pod.Namespace, pod.Name)
+
 	// skip K8s watcher container
 	if strings.Contains(pod.Name, kubeNotaryWatcherName) {
 		return
