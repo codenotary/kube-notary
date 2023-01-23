@@ -49,16 +49,6 @@ func (w *WatchDog) ResultsHandler() http.Handler {
 			res[i] = ww.res[hash]
 		}
 
-		if r.URL.Query().Get("output") == "bulk_sign" {
-			err := bulkSigningScript(w, res)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				_, _ = fmt.Fprintln(w, err.Error())
-				return
-			}
-			return
-		}
-
 		b, err := json.Marshal(res)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -70,6 +60,27 @@ func (w *WatchDog) ResultsHandler() http.Handler {
 		headers.Set("Access-Control-Allow-Origin", "*")
 		headers.Set("Content-Type", "application/json")
 		_, _ = w.Write(b)
+	})
+}
+func (w *WatchDog) BulkHandler() http.Handler {
+	ww := w
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ww.mu.RLock()
+		defer ww.mu.RUnlock()
+
+		// Make results
+		res := make([]Result, len(ww.idx))
+		for i, hash := range ww.idx {
+			res[i] = ww.res[hash]
+		}
+
+		err := bulkSigningScript(w, res)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprintln(w, err.Error())
+			return
+		}
+		return
 	})
 }
 
