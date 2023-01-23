@@ -133,6 +133,7 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		var err error
 		var ok bool
 		if hash, ok = w.getAuthorized(status.ImageID); !ok {
+			log.Infof("getting Image Hash from %s ", status.Name)
 			hash, err = verify.ImageHash(
 				status.ImageID,
 				opts...,
