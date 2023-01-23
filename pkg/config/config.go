@@ -1,11 +1,13 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/codenotary/vcn-enterprise/pkg/meta"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/viper"
@@ -142,4 +144,13 @@ func (c *Config) LcCrossLedgerKeyLedgerName() string {
 // LcSignerID parameter is used to filter result on a specific signer ID.
 func (c *Config) LcSignerID() string {
 	return c.v.GetString(LcSignerID)
+}
+
+// ApiKey ...
+func (c *Config) ApiKey() (string, error) {
+	apiKey := os.Getenv(meta.VcnLcApiKey)
+	if apiKey == "" {
+		return "", errors.New("no api key found")
+	}
+	return apiKey, nil
 }
