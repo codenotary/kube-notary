@@ -63,8 +63,8 @@ func (p prometheusRecorder) Record(m Metric) {
 		"hash":     m.Hash,
 	}
 
-	verificationStatus.With(labels).Add(float64(m.Verification.Status))
-	verificationLevel.With(labels).Add(float64(m.Verification.Level))
+	verificationStatus.With(labels).Set(float64(m.Verification.Status))
+	verificationLevel.With(labels).Set(float64(m.Verification.Level))
 }
 
 func (p prometheusRecorder) Reset() {
