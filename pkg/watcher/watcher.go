@@ -31,26 +31,28 @@ import (
 const kubeNotaryWatcherName = "kube-notary"
 
 type WatchDog struct {
-	clientSet *kubernetes.Clientset
-	rec       metrics.Recorder
-	cfg       *config.Config
-	res       map[string]Result
-	tmp       []string
-	idx       []string
-	seen      map[string]bool
-	mu        *sync.RWMutex
+	clientSet  *kubernetes.Clientset
+	rec        metrics.Recorder
+	cfg        *config.Config
+	res        map[string]Result
+	tmp        []string
+	idx        []string
+	seen       map[string]bool
+	imageCache map[string]string
+	mu         *sync.RWMutex
 }
 
 func New(clientSet *kubernetes.Clientset, cfg *config.Config, rec metrics.Recorder) *WatchDog {
 	return &WatchDog{
-		clientSet: clientSet,
-		rec:       rec,
-		cfg:       cfg,
-		res:       map[string]Result{},
-		tmp:       []string{},
-		idx:       []string{},
-		seen:      map[string]bool{},
-		mu:        &sync.RWMutex{},
+		clientSet:  clientSet,
+		rec:        rec,
+		cfg:        cfg,
+		res:        map[string]Result{},
+		tmp:        []string{},
+		idx:        []string{},
+		seen:       map[string]bool{},
+		imageCache: map[string]string{},
+		mu:         &sync.RWMutex{},
 	}
 }
 
@@ -60,20 +62,18 @@ func (w *WatchDog) Run() {
 	keys := w.cfg.TrustedKeys()
 	org := w.cfg.TrustedOrg()
 
-	for {
-		var opt verify.Option
-		if org != "" {
-			opt = verify.WithSignerOrg(org)
-			if len(keys) > 0 {
-				log.Warn("Trusted keys ignored because an organization is set")
-				keys = nil
-			}
-		} else if len(keys) > 0 {
-			opt = verify.WithSignerKeys(keys...)
+	var opt verify.Option
+	if org != "" {
+		opt = verify.WithSignerOrg(org)
+		if len(keys) > 0 {
+			log.Warn("Trusted keys ignored because an organization is set")
+			keys = nil
 		}
+	} else if len(keys) > 0 {
+		opt = verify.WithSignerKeys(keys...)
+	}
 
-		w.rec.Reset()
-
+	for {
 		pods, err := w.clientSet.CoreV1().Pods(w.cfg.Namespace()).List(context.Background(), metav1.ListOptions{})
 		if err != nil {
 			log.Errorf("Error getting pods: %s", err)
@@ -90,7 +90,7 @@ func (w *WatchDog) Run() {
 }
 
 func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
-
+	log.Printf("Watching")
 	// skip K8s watcher container
 	if strings.Contains(pod.Name, kubeNotaryWatcherName) {
 		return
@@ -129,22 +129,31 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			continue
 		}
 
-		hash, err := verify.ImageHash(
-			status.ImageID,
-			opts...,
-		)
+		var hash string
+		var err error
+		var ok bool
+		if hash, ok = w.getAuthorized(status.ImageID); !ok {
+			log.Infof("getting Image Hash from %s ", status.Name)
+			hash, err = verify.ImageHash(
+				status.ImageID,
+				opts...,
+			)
+			if err != nil {
+				errorList = append(errorList, err)
+				v.Status = meta.StatusUnknown
+				v.Level = meta.LevelUnknown
+				v.Date = ""
+				v.Trusted = false
+				errorList = append(errorList, err)
+				log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+			}
+
+			if hash != "" && err == nil {
+				w.setAuthorized(status.ImageID, hash)
+			}
+		}
 
 		log.Debugf("Veryfy image name %s id %s hash %s", status.Image, status.ImageID, hash)
-
-		if err != nil {
-			errorList = append(errorList, err)
-			v.Status = meta.StatusUnknown
-			v.Level = meta.LevelUnknown
-			v.Date = ""
-			v.Trusted = false
-			errorList = append(errorList, err)
-			log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
-		}
 
 		// @TODO: w.cfg.LcHost() == "" move to app init
 		if hash == "" {
