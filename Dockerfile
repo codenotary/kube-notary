@@ -27,6 +27,8 @@ RUN echo "curl -s 127.0.0.1:9581/bulk_sign" > /bin/bulk_sign \
     && chmod +x /bin/bulk_sign
 
 COPY --from=builder /src/kube-notary /bin/kube-notary
+COPY --from=builder /src/vcn /bin/vcn
+RUN chmod +x /bin/vcn
 
 RUN mkdir .vcn
 
