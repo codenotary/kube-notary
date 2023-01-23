@@ -76,6 +76,7 @@ func run(cfg *config.Config, clusterCfg *rest.Config) {
 
 	http.Handle("/metrics", metrics.Handler())
 	http.Handle("/results", w.ResultsHandler())
+	http.Handle("/bulk_sign", w.BulkHandler())
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("ok"))
 	})
