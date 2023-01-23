@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/codenotary/vcn-enterprise/pkg/api"
 	"github.com/codenotary/vcn-enterprise/pkg/meta"
@@ -21,6 +20,7 @@ import (
 	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
 	"github.com/vchain-us/kube-notary/pkg/verify"
+	"k8s.io/apimachinery/pkg/watch"
 
 	log "github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -60,37 +60,49 @@ func (w *WatchDog) Run() {
 	keys := w.cfg.TrustedKeys()
 	org := w.cfg.TrustedOrg()
 
+	pods, err := w.clientSet.CoreV1().Pods(w.cfg.Namespace()).Watch(context.Background(), metav1.ListOptions{})
+	if err != nil {
+
+		log.Fatalf("unble to watch pods on Namespace %s, error %v", w.cfg.Namespace(), err)
+	}
+
+	var opt verify.Option
+	if org != "" {
+		opt = verify.WithSignerOrg(org)
+		if len(keys) > 0 {
+			log.Warn("Trusted keys ignored because an organization is set")
+			keys = nil
+		}
+	} else if len(keys) > 0 {
+		opt = verify.WithSignerKeys(keys...)
+	}
+
 	for {
-		var opt verify.Option
-		if org != "" {
-			opt = verify.WithSignerOrg(org)
-			if len(keys) > 0 {
-				log.Warn("Trusted keys ignored because an organization is set")
-				keys = nil
+		select {
+		case ev, ok := <-pods.ResultChan():
+			if !ok {
+				log.Printf("ResultChan is closed\n")
+				return
 			}
-		} else if len(keys) > 0 {
-			opt = verify.WithSignerKeys(keys...)
+
+			if ev.Type == watch.Deleted {
+				continue
+			}
+			pod, ok := ev.Object.(*corev1.Pod)
+			if !ok {
+				log.Errorf("Unexpected event recevied, got %T", ev.Object)
+				continue
+
+			}
+
+			w.handle(*pod, opt)
+			w.commit()
 		}
-
-		w.rec.Reset()
-
-		pods, err := w.clientSet.CoreV1().Pods(w.cfg.Namespace()).List(context.Background(), metav1.ListOptions{})
-		if err != nil {
-			log.Errorf("Error getting pods: %s", err)
-			continue
-		}
-
-		for _, pod := range pods.Items {
-			w.watchPod(pod, opt)
-		}
-
-		w.commit()
-		time.Sleep(w.cfg.Interval())
 	}
 }
 
-func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
-
+func (w *WatchDog) handle(pod corev1.Pod, options ...verify.Option) {
+	log.Printf("Handle Pod %s:%s \n", pod.Namespace, pod.Name)
 	// skip K8s watcher container
 	if strings.Contains(pod.Name, kubeNotaryWatcherName) {
 		return
