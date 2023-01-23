@@ -31,26 +31,28 @@ import (
 const kubeNotaryWatcherName = "kube-notary"
 
 type WatchDog struct {
-	clientSet *kubernetes.Clientset
-	rec       metrics.Recorder
-	cfg       *config.Config
-	res       map[string]Result
-	tmp       []string
-	idx       []string
-	seen      map[string]bool
-	mu        *sync.RWMutex
+	clientSet  *kubernetes.Clientset
+	rec        metrics.Recorder
+	cfg        *config.Config
+	res        map[string]Result
+	tmp        []string
+	idx        []string
+	seen       map[string]bool
+	imageCache map[string]string
+	mu         *sync.RWMutex
 }
 
 func New(clientSet *kubernetes.Clientset, cfg *config.Config, rec metrics.Recorder) *WatchDog {
 	return &WatchDog{
-		clientSet: clientSet,
-		rec:       rec,
-		cfg:       cfg,
-		res:       map[string]Result{},
-		tmp:       []string{},
-		idx:       []string{},
-		seen:      map[string]bool{},
-		mu:        &sync.RWMutex{},
+		clientSet:  clientSet,
+		rec:        rec,
+		cfg:        cfg,
+		res:        map[string]Result{},
+		tmp:        []string{},
+		idx:        []string{},
+		seen:       map[string]bool{},
+		imageCache: map[string]string{},
+		mu:         &sync.RWMutex{},
 	}
 }
 
@@ -127,22 +129,30 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
 			continue
 		}
 
-		hash, err := verify.ImageHash(
-			status.ImageID,
-			opts...,
-		)
+		var hash string
+		var err error
+		var ok bool
+		if hash, ok = w.getAuthorized(status.ImageID); !ok {
+			hash, err = verify.ImageHash(
+				status.ImageID,
+				opts...,
+			)
+			if err != nil {
+				errorList = append(errorList, err)
+				v.Status = meta.StatusUnknown
+				v.Level = meta.LevelUnknown
+				v.Date = ""
+				v.Trusted = false
+				errorList = append(errorList, err)
+				log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+			}
+
+			if hash != "" && err == nil {
+				w.setAuthorized(status.ImageID, hash)
+			}
+		}
 
 		log.Debugf("Veryfy image name %s id %s hash %s", status.Image, status.ImageID, hash)
-
-		if err != nil {
-			errorList = append(errorList, err)
-			v.Status = meta.StatusUnknown
-			v.Level = meta.LevelUnknown
-			v.Date = ""
-			v.Trusted = false
-			errorList = append(errorList, err)
-			log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
-		}
 
 		// @TODO: w.cfg.LcHost() == "" move to app init
 		if hash == "" {

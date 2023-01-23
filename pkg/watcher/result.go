@@ -151,6 +151,21 @@ func (w *WatchDog) upsert(pod corev1.Pod, status corev1.ContainerStatus, v *veri
 	w.res[hash] = r
 }
 
+func (w *WatchDog) getAuthorized(imageID string) (hashID string, found bool) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	h, ok := w.imageCache[imageID]
+	return h, ok
+}
+
+func (w *WatchDog) setAuthorized(imageID, hash string) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	w.imageCache[imageID] = hash
+}
+
 func cleanShaString(r string) string {
 	return strings.ReplaceAll(r, "sha256:", "")
 }
