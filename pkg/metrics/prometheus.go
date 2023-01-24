@@ -25,7 +25,7 @@ var (
 		"hash",
 	}
 	statusLabels = []string{
-		"namespace",
+		"target_namespace",
 		"status",
 	}
 
@@ -45,10 +45,10 @@ var (
 		labelNames,
 	)
 
-	TotalListedPods = prometheus.NewGaugeVec(
+	aggregateStatus = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "kube_notary_total_listed_pods",
-			Help: "total pods detected",
+			Name: "kube_notary_aggregate_status",
+			Help: "Status aggregate over all containers",
 		},
 		statusLabels,
 	)
@@ -58,7 +58,7 @@ func init() {
 	// Metrics have to be registered to be exposed:
 	prometheus.MustRegister(verificationStatus)
 	prometheus.MustRegister(verificationLevel)
-	prometheus.MustRegister(TotalListedPods)
+	prometheus.MustRegister(aggregateStatus)
 }
 
 func Handler() http.Handler {
@@ -93,8 +93,8 @@ func NewRecorder() Recorder {
 
 func SetTotals(ns, status string, total int) {
 	labels := prometheus.Labels{
-		"namespace": ns,
-		"status":    status,
+		"target_namespace": ns,
+		"status":           status,
 	}
-	TotalListedPods.With(labels).Set(float64(total))
+	aggregateStatus.With(labels).Set(float64(total))
 }
