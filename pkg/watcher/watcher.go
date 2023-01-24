@@ -10,6 +10,7 @@ package watcher
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -234,6 +235,9 @@ func VerifyArtifact(hash, apiKey, lcLedger, signerID, lcHost, lcPort, lcCert str
 	hash = strings.TrimPrefix(hash, "sha256:")
 	metadata := map[string][]string{meta.VcnLCCmdHeaderName: {meta.VcnLCVerifyCmdHeaderValue}}
 	a, _, err = cl.LoadArtifact(hash, signerID, "", 0, metadata)
+	if errors.Is(err, api.ErrNotFound) {
+		return nil, fmt.Errorf("no artifact found, error %w", err)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("unable to load artifact, error %w", err)
 	}
