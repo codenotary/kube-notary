@@ -24,6 +24,10 @@ var (
 		"image_id",
 		"hash",
 	}
+	statusLabels = []string{
+		"namespace",
+		"status",
+	}
 
 	verificationStatus = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -41,25 +45,14 @@ var (
 		labelNames,
 	)
 
-	TotalListedPods = prometheus.NewGauge(
+	TotalListedPods = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "kube_notary_total_listed_pods",
 			Help: "total pods detected",
 		},
+		statusLabels,
 	)
 
-	TotalAuthorizationsWithSuccess = prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name: "kube_notary_total_successful_authorize_pods",
-			Help: "total successful authorized pods",
-		},
-	)
-	TotalAuthorizationsWithFailure = prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name: "kube_notary_total_failed_authorize_pods",
-			Help: "total failed authorized pods",
-		},
-	)
 )
 
 func init() {
@@ -67,8 +60,6 @@ func init() {
 	prometheus.MustRegister(verificationStatus)
 	prometheus.MustRegister(verificationLevel)
 	prometheus.MustRegister(TotalListedPods)
-	prometheus.MustRegister(TotalAuthorizationsWithSuccess)
-	prometheus.MustRegister(TotalAuthorizationsWithFailure)
 }
 
 func Handler() http.Handler {
@@ -99,4 +90,12 @@ type prometheusRecorder struct{}
 
 func NewRecorder() Recorder {
 	return &prometheusRecorder{}
+}
+
+func SetTotals(ns, status string, total int) {
+	labels := prometheus.Labels{
+		"namespace": ns,
+		"status": status,
+	}
+	TotalListedPods.With(labels).Set(float64(total))
 }

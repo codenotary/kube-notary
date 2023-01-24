@@ -123,7 +123,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "count(vcn_verification_level)",
+          "expr": "kube_notary_total_listed_pods",
           "format": "time_series",
           "instant": false,
           "intervalFactor": 1,

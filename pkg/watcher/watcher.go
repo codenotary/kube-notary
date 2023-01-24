@@ -82,24 +82,24 @@ func (w *WatchDog) Run() {
 			continue
 		}
 
-		metrics.TotalListedPods.Set(float64(len(pods.Items)))
-
-		success := 0
+		var statusMap map[meta.Status]int
 		for _, pod := range pods.Items {
-			success += w.watchPod(pod, opt)
+			statuses := w.watchPod(pod, opt)
+			for i,s := range statuses {
+				statusMap[i]+=s
+			}
 		}
-
-		metrics.TotalAuthorizationsWithSuccess.Set(float64(success))
-		metrics.TotalAuthorizationsWithFailure.Set(float64(len(pods.Items) - success))
+		for st, c := range statusMap {
+			metrics.SetTotals(w.cfg.Namespace(), st.String(), c)
+		}
 		w.commit()
 		time.Sleep(w.cfg.Interval())
 	}
 }
 
-func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (success int) {
+func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (statuses map[meta.Status]int) {
 	log.Infof("Processing Pod %s:%s", pod.Namespace, pod.Name)
-
-	success = 0
+	
 	// skip K8s watcher container
 	if strings.Contains(pod.Name, kubeNotaryWatcherName) || strings.Contains(pod.Namespace, kubeSystemNamespace) {
 		return
@@ -125,7 +125,6 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (success i
 	opts := make([]verify.Option, len(options)+1)
 	copy(opts, options)
 	opts[l-1] = verify.WithAuthKeychain(keychain)
-
 	for _, status := range pod.Status.ContainerStatuses {
 		v := &verify.Verification{}
 
@@ -195,7 +194,6 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (success i
 			v.Trusted = false
 			if ar.Status == meta.StatusTrusted {
 				v.Trusted = true
-				success++
 			}
 			log.Infof("Image %s with ID %s is trusted", status.Image, status.ImageID)
 		} else {
@@ -206,7 +204,7 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (success i
 			errorList = append(errorList, err)
 			log.Errorf("Cannot verify %s in pod %s: %s", status.ImageID, pod.Name, err)
 		}
-
+		statuses[v.Status]++
 		// @TODO: Record metric for a pod ¿?¿?
 		w.rec.Record(metrics.Metric{
 			Pod:             &pod,
