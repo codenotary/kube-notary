@@ -154,7 +154,7 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (success i
 				v.Date = ""
 				v.Trusted = false
 				errorList = append(errorList, err)
-				log.Errorf(`Cannot verify "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
+				log.Errorf(`Unable to get ImageHash from Registry "%s" in pod "%s": %s`, status.ImageID, pod.Name, err)
 			}
 
 			if hash != "" && err == nil {
@@ -162,12 +162,12 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (success i
 			}
 		}
 
-		log.Debugf("Veryfy image name %s id %s hash %s", status.Image, status.ImageID, hash)
-
-		// @TODO: w.cfg.LcHost() == "" move to app init
-		if hash == "" || w.cfg.LcHost() == "" {
+		if hash == "" {
+			log.Errorf("Cannot Veryfy from empty HASH image name %s id %s", status.Image, status.ImageID)
 			continue
 		}
+
+		log.Infof("Veryfy image name %s id %s hash %s", status.Image, status.ImageID, hash)
 
 		apiKey, apiKeyErr := w.cfg.ApiKey() // @TODO: To init App
 		if apiKeyErr != nil {
