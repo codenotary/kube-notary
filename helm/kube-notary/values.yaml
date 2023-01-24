@@ -19,6 +19,9 @@ cnc:
   noTls: false
   skipTlsVerify: true
   signerID:
+  apiKey:
+
+serviceMonitorLabels: {}
 
 # Installation config
 service:

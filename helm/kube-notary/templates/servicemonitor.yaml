@@ -1,0 +1,17 @@
+{{ if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "kube-notary.fullname" . }}
+  labels:
+{{ .Values.serviceMonitorLabels | toYaml| indent 4 }}
+{{ include "kube-notary.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      k8s-app: kube-notary
+  endpoints:
+  - port: metrics-port
+    path: /metrics
+
+{{ end }}

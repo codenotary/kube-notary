@@ -29,10 +29,8 @@ Then, to install `kube-notary`:
 * Change directory into `kube-notary`.
 
 To run the following steps are required:
-* create an api-key secret
- ```shell script
-kubectl create secret generic vcn-lc-api-key --from-literal=api-key={a valid api key}
-```
+
+* Be sure to have an api-key secret
 > Note: You can obtain an api-key from [CodeNotary Cloud](https://codenotary.com/products/ci-cd/).
 
 * Install helm chart with following parameters:
@@ -48,6 +46,7 @@ helm install \
     --set cnc.skipTlsVerify={CNC skip tls verification, default false} \
     --set cnc.signerID={CNC parameter used to filter results on a specific signer ID, default nil} \
     --set cnc.ledgerName={CNC used when a cross-ledger key is provided in order to specify the ledger on which future operations will be directed. Default nil} \
+    --set cnc.apiKey={API Key from CNC} \
     --wait
 ```
 
