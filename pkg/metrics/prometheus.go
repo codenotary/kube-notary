@@ -52,7 +52,6 @@ var (
 		},
 		statusLabels,
 	)
-
 )
 
 func init() {
@@ -95,7 +94,7 @@ func NewRecorder() Recorder {
 func SetTotals(ns, status string, total int) {
 	labels := prometheus.Labels{
 		"namespace": ns,
-		"status": status,
+		"status":    status,
 	}
 	TotalListedPods.With(labels).Set(float64(total))
 }

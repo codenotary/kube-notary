@@ -82,11 +82,11 @@ func (w *WatchDog) Run() {
 			continue
 		}
 
-		var statusMap map[meta.Status]int
+		statusMap := make(map[meta.Status]int, 5)
 		for _, pod := range pods.Items {
 			statuses := w.watchPod(pod, opt)
-			for i,s := range statuses {
-				statusMap[i]+=s
+			for i, s := range statuses {
+				statusMap[i] += s
 			}
 		}
 		for st, c := range statusMap {
@@ -98,9 +98,9 @@ func (w *WatchDog) Run() {
 }
 
 func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (statuses map[meta.Status]int) {
-	statuses=make(map[meta.Status]int,5)
+	statuses = make(map[meta.Status]int, 5)
 	log.Infof("Processing Pod %s:%s", pod.Namespace, pod.Name)
-	
+
 	// skip K8s watcher container
 	if strings.Contains(pod.Name, kubeNotaryWatcherName) || strings.Contains(pod.Namespace, kubeSystemNamespace) {
 		return
