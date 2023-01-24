@@ -29,6 +29,7 @@ import (
 )
 
 const kubeNotaryWatcherName = "kube-notary"
+const kubeSystemNamespace = "kube-system"
 
 type WatchDog struct {
 	clientSet  *kubernetes.Clientset
@@ -80,20 +81,26 @@ func (w *WatchDog) Run() {
 			continue
 		}
 
+		metrics.TotalListedPods.Set(float64(len(pods.Items)))
+
+		success := 0
 		for _, pod := range pods.Items {
-			w.watchPod(pod, opt)
+			success += w.watchPod(pod, opt)
 		}
 
+		metrics.TotalAuthorizationsWithSuccess.Set(float64(success))
+		metrics.TotalAuthorizationsWithFailure.Set(float64(len(pods.Items) - success))
 		w.commit()
 		time.Sleep(w.cfg.Interval())
 	}
 }
 
-func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
+func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (success int) {
 	log.Infof("Processing Pod %s:%s", pod.Namespace, pod.Name)
 
+	success = 0
 	// skip K8s watcher container
-	if strings.Contains(pod.Name, kubeNotaryWatcherName) {
+	if strings.Contains(pod.Name, kubeNotaryWatcherName) || strings.Contains(pod.Namespace, kubeSystemNamespace) {
 		return
 	}
 
@@ -187,6 +194,7 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
 				v.Trusted = false
 				if ar.Status == meta.StatusTrusted {
 					v.Trusted = true
+					success++
 				}
 				log.Infof("Image %s with ID %s is trusted", status.Image, status.ImageID)
 			default:
@@ -197,6 +205,8 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
 				errorList = append(errorList, err)
 				log.Errorf("Cannot verify %s in pod %s: %s", status.ImageID, pod.Name, err)
 			}
+
+			// @TODO: Record metric for a pod ¿?¿?
 			w.rec.Record(metrics.Metric{
 				Pod:             &pod,
 				ContainerStatus: &status,
@@ -208,6 +218,8 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) {
 		// update or insert the result into tmp list
 		w.upsert(pod, status, v, hash, errorList)
 	}
+
+	return
 }
 
 func VerifyArtifact(hash, apiKey, lcLedger, signerID, lcHost, lcPort, lcCert string, lcSkipTlsVerify, lcNoTls bool) (a *api.LcArtifact, err error) {

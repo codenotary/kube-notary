@@ -40,12 +40,35 @@ var (
 		},
 		labelNames,
 	)
+
+	TotalListedPods = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "total_listed_pods",
+			Help: "total pods detected",
+		},
+	)
+
+	TotalAuthorizationsWithSuccess = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "total_successful_authorize_pods",
+			Help: "total successful authorized pods",
+		},
+	)
+	TotalAuthorizationsWithFailure = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "total_failed_authorize_pods",
+			Help: "total failed authorized pods",
+		},
+	)
 )
 
 func init() {
 	// Metrics have to be registered to be exposed:
 	prometheus.MustRegister(verificationStatus)
 	prometheus.MustRegister(verificationLevel)
+	prometheus.MustRegister(TotalListedPods)
+	prometheus.MustRegister(TotalAuthorizationsWithSuccess)
+	prometheus.MustRegister(TotalAuthorizationsWithFailure)
 }
 
 func Handler() http.Handler {
