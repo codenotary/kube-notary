@@ -16,6 +16,7 @@ RUN git config --global url."git@github.com:codenotary/vcn-enterprise".insteadOf
 COPY . .
 RUN --mount=type=ssh \
   make kube-notary
+RUN wget https://vcn-releases.s3.eu-west-1.amazonaws.com/vcn-latest-linux-amd64-static -O vcn
 
 FROM alpine:3.15
 

@@ -123,7 +123,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "count(vcn_verification_level)",
+          "expr": "sum(kube_notary_aggregate_status)",
           "format": "time_series",
           "instant": false,
           "intervalFactor": 1,
@@ -206,7 +206,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "count(vcn_verification_status==0)",
+          "expr": "kube_notary_aggregate_status{status='TRUSTED'}",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -215,7 +215,7 @@
           "refId": "A"
         },
         {
-          "expr": "count(vcn_verification_status==2)",
+          "expr": "kube_notary_aggregate_status{status='UNKNOWN'}",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 1,
@@ -223,7 +223,7 @@
           "refId": "B"
         },
         {
-          "expr": "count(vcn_verification_status==1)",
+          "expr": "kube_notary_aggregate_status{status='UNTRUSTED'}",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 1,
@@ -231,7 +231,7 @@
           "refId": "C"
         },
         {
-          "expr": "count(vcn_verification_status==3)",
+          "expr": "kube_notary_aggregate_status{status='UNSUPPORTED'}",
           "format": "time_series",
           "instant": true,
           "interval": "",
