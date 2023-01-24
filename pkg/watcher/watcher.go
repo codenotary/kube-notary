@@ -165,56 +165,55 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (success i
 		log.Debugf("Veryfy image name %s id %s hash %s", status.Image, status.ImageID, hash)
 
 		// @TODO: w.cfg.LcHost() == "" move to app init
-		if hash == "" {
+		if hash == "" || w.cfg.LcHost() == "" {
 			continue
 		}
-		if w.cfg.LcHost() != "" && hash != "" {
-			apiKey, apiKeyErr := w.cfg.ApiKey() // @TODO: To init App
-			if apiKeyErr != nil {
-				log.Warnf("Unable to get Api Key from config, error: %v", apiKeyErr)
-				return
-			}
-			ar, err := VerifyArtifact(hash, apiKey, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
-			switch err {
-			case api.ErrNotVerified:
-				v.Status = meta.StatusUnknown
-				v.Level = meta.LevelUnknown
-				v.Date = ""
-				v.Trusted = false
-				log.Warnf("Image %s in pod %s is not verified: %s", status.ImageID, pod.Name, err)
-			case api.ErrNotFound:
-				v.Status = meta.StatusUnknown
-				v.Level = meta.LevelUnknown
-				v.Date = ""
-				v.Trusted = false
-				log.Warnf("Image %s in pod %s not found: %s", status.ImageID, pod.Name, err)
-			case nil:
-				v.Status = ar.Status
-				v.Level = meta.LevelCNLC
-				v.Date = ar.Date()
-				v.Trusted = false
-				if ar.Status == meta.StatusTrusted {
-					v.Trusted = true
-					success++
-				}
-				log.Infof("Image %s with ID %s is trusted", status.Image, status.ImageID)
-			default:
-				v.Status = meta.StatusUnknown
-				v.Level = meta.LevelUnknown
-				v.Date = ""
-				v.Trusted = false
-				errorList = append(errorList, err)
-				log.Errorf("Cannot verify %s in pod %s: %s", status.ImageID, pod.Name, err)
-			}
 
-			// @TODO: Record metric for a pod ¿?¿?
-			w.rec.Record(metrics.Metric{
-				Pod:             &pod,
-				ContainerStatus: &status,
-				Verification:    v,
-				Hash:            hash,
-			})
+		apiKey, apiKeyErr := w.cfg.ApiKey() // @TODO: To init App
+		if apiKeyErr != nil {
+			log.Warnf("Unable to get Api Key from config, error: %v", apiKeyErr)
+			return
 		}
+		ar, err := VerifyArtifact(hash, apiKey, w.cfg.LcCrossLedgerKeyLedgerName(), w.cfg.LcSignerID(), w.cfg.LcHost(), w.cfg.LcPort(), w.cfg.LcCert(), w.cfg.LcSkipTlsVerify(), w.cfg.LcNoTls())
+
+		if errors.Is(err, api.ErrNotVerified) {
+			v.Status = meta.StatusUnknown
+			v.Level = meta.LevelUnknown
+			v.Date = ""
+			v.Trusted = false
+			log.Errorf("Image %s in pod %s is not verified: %s", status.ImageID, pod.Name, err)
+		} else if errors.Is(err, api.ErrNotFound) {
+			v.Status = meta.StatusUnknown
+			v.Level = meta.LevelUnknown
+			v.Date = ""
+			v.Trusted = false
+			log.Errorf("Image %s in pod %s not found: %s", status.ImageID, pod.Name, err)
+		} else if err == nil {
+			v.Status = ar.Status
+			v.Level = meta.LevelCNLC
+			v.Date = ar.Date()
+			v.Trusted = false
+			if ar.Status == meta.StatusTrusted {
+				v.Trusted = true
+				success++
+			}
+			log.Infof("Image %s with ID %s is trusted", status.Image, status.ImageID)
+		} else {
+			v.Status = meta.StatusUnknown
+			v.Level = meta.LevelUnknown
+			v.Date = ""
+			v.Trusted = false
+			errorList = append(errorList, err)
+			log.Errorf("Cannot verify %s in pod %s: %s", status.ImageID, pod.Name, err)
+		}
+
+		// @TODO: Record metric for a pod ¿?¿?
+		w.rec.Record(metrics.Metric{
+			Pod:             &pod,
+			ContainerStatus: &status,
+			Verification:    v,
+			Hash:            hash,
+		})
 
 		// update or insert the result into tmp list
 		w.upsert(pod, status, v, hash, errorList)
@@ -236,10 +235,10 @@ func VerifyArtifact(hash, apiKey, lcLedger, signerID, lcHost, lcPort, lcCert str
 	metadata := map[string][]string{meta.VcnLCCmdHeaderName: {meta.VcnLCVerifyCmdHeaderValue}}
 	a, _, err = cl.LoadArtifact(hash, signerID, "", 0, metadata)
 	if errors.Is(err, api.ErrNotFound) {
-		return nil, fmt.Errorf("no artifact found, error %w", err)
+		return nil, fmt.Errorf("no artifact found on hash %s, error %w", hash, err)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("unable to load artifact, error %w", err)
+		return nil, fmt.Errorf("unable to load artifact on hash %s, error %w", hash, err)
 	}
 
 	return a, err
