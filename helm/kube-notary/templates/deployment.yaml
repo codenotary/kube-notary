@@ -47,7 +47,7 @@ spec:
             - name: VCN_LC_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: vcn-lc-api-key
+                  name: {{ include "kube-notary.fullname" . }}
                   key: api-key
           {{- end }}
           ports:

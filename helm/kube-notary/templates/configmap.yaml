@@ -18,10 +18,10 @@ data:
         - {{ . | quote }}
         {{- end }}
     cnc:
-      host: {{ .Values.cnc.host }}
+      host: {{ required "Please specify an host" .Values.cnc.host }}
       port: {{ .Values.cnc.port }}
       cert: {{ .Values.cnc.cert }}
       noTls: {{ .Values.cnc.noTls }}
       skipTlsVerify: {{ .Values.cnc.skipTlsVerify }}
-      crossLedgerKeyLedgerName: {{ .Values.cnc.ledgerName }}
-      signerID: {{ .Values.cnc.signerID }}
+      ledgerName: {{ required "Please specify a ledger name" .Values.cnc.ledgerName }}
+      signerID: {{ required "Please specify a signerID" .Values.cnc.signerID }}
