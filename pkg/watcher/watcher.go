@@ -98,6 +98,7 @@ func (w *WatchDog) Run() {
 }
 
 func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (statuses map[meta.Status]int) {
+	statuses=make(map[meta.Status]int,5)
 	log.Infof("Processing Pod %s:%s", pod.Namespace, pod.Name)
 	
 	// skip K8s watcher container
