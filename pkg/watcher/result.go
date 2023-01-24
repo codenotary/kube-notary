@@ -120,7 +120,7 @@ func (w *WatchDog) upsert(pod corev1.Pod, status corev1.ContainerStatus, v *veri
 		}
 	}
 
-	r.Verification = v
+	r.Verification = v // @TODO: Not used anymore ¿?
 
 	// update errors
 	r.Errors = make([]string, len(errs))

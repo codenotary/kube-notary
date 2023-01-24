@@ -62,6 +62,10 @@ func main() {
 		log.Fatalf("unable to get cluster config from flags, error %v", err)
 	}
 
+	if clusterCfg.Host == "" {
+		log.Fatal("No LC HOST configured, aborting")
+	}
+
 	run(cfg, clusterCfg)
 }
 
