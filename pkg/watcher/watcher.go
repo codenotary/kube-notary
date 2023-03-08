@@ -12,12 +12,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/codenotary/vcn-enterprise/pkg/api"
 	"github.com/codenotary/vcn-enterprise/pkg/meta"
+	"github.com/google/uuid"
 	"github.com/vchain-us/kube-notary/pkg/config"
 	"github.com/vchain-us/kube-notary/pkg/image"
 	"github.com/vchain-us/kube-notary/pkg/metrics"
@@ -223,7 +225,10 @@ func (w *WatchDog) watchPod(pod corev1.Pod, options ...verify.Option) (statuses 
 
 func VerifyArtifact(hash, apiKey, lcLedger, signerID, lcHost, lcPort, lcCert string, lcSkipTlsVerify, lcNoTls bool) (a *api.LcArtifact, err error) {
 
-	log.Printf("VerifyArtifact apiKey %s ledger %s host %s port %s cert %s skip %v noTls %v \n", apiKey, lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls)
+	id := uuid.New().String()
+	startTs := time.Now()
+
+	log.Printf("VerifyArtifact trace %s apiKey %s ledger %s host %s port %s cert %s skip %v noTls %v total goroutines %d\n", id, apiKey, lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls, runtime.NumGoroutine())
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -233,7 +238,14 @@ func VerifyArtifact(hash, apiKey, lcLedger, signerID, lcHost, lcPort, lcCert str
 		return nil, fmt.Errorf("unable to build client, error %w", err)
 	}
 
-	defer cl.Client.Disconnect()
+	defer func() {
+		elapsed := time.Since(startTs)
+		log.Printf("VerifyArtifact trace %s Shutdown, total time %s, total goroutines %s", elapsed, runtime.NumGoroutine())
+		if err := cl.Client.Disconnect(); err != nil {
+			log.Println("VerifyArtifact Trace %s Error Shutting down, got %v", id, err)
+		}
+		log.Printf("VerifyArtifact trace %s Shutdown DONE, total time %s, total goroutines %s", elapsed, runtime.NumGoroutine())
+	}()
 
 	hash = strings.TrimPrefix(hash, "sha256:")
 	metadata := map[string][]string{meta.VcnLCCmdHeaderName: {meta.VcnLCVerifyCmdHeaderValue}}

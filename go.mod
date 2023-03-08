@@ -6,6 +6,8 @@ require (
 	github.com/codenotary/vcn-enterprise v1.0.5-0.20230308114815-8ac1fc853ddc
 	github.com/google/go-containerregistry v0.12.0
 	github.com/google/go-containerregistry/pkg/authn/k8schain v0.0.0-20230104193340-e797859b62b6
+	github.com/google/gops v0.3.27
+	github.com/google/uuid v1.3.0
 	github.com/prometheus/client_golang v1.13.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.14.0
@@ -139,7 +141,7 @@ require (
 	github.com/sigstore/sigstore v1.4.2 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
-	github.com/spf13/cobra v1.6.0 // indirect
+	github.com/spf13/cobra v1.6.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
@@ -159,7 +161,7 @@ require (
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/oauth2 v0.1.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.2.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/term v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.1.0 // indirect

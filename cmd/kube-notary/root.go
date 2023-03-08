@@ -31,11 +31,16 @@ import (
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
+	"github.com/google/gops/agent"
 )
 
 const httpPort = 9581
 
 func main() {
+	if err := agent.Listen(agent.Options{Addr: "0.0.0.0:10000"}); err != nil {
+		log.Fatal(err)
+	}
+
 	configFilePath := flag.String("config", config.DefaultConfigPath, "config file path")
 	mode := flag.String("k8s-mode", config.InternalMode, "kubernetes controller mode, external runs out of the cluster (development mode")
 	flag.Parse()
