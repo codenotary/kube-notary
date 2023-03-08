@@ -225,7 +225,10 @@ func VerifyArtifact(hash, apiKey, lcLedger, signerID, lcHost, lcPort, lcCert str
 
 	log.Printf("VerifyArtifact apiKey %s ledger %s host %s port %s cert %s skip %v noTls %v \n", apiKey, lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls)
 
-	cl, err := buildClient(apiKey, lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	cl, err := buildClient(ctx, apiKey, lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build client, error %w", err)
 	}
@@ -245,12 +248,13 @@ func VerifyArtifact(hash, apiKey, lcLedger, signerID, lcHost, lcPort, lcCert str
 	return a, err
 }
 
-func buildClient(apiKey, lcLedger, lcHost, lcPort, lcCert string, lcSkipTlsVerify, lcNoTls bool) (*api.LcUser, error) {
+func buildClient(ctx context.Context, apiKey, lcLedger, lcHost, lcPort, lcCert string, lcSkipTlsVerify, lcNoTls bool) (*api.LcUser, error) {
+
 	client, err := api.NewLcClient(apiKey, lcLedger, lcHost, lcPort, lcCert, lcSkipTlsVerify, lcNoTls, nil, 0, 0)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create DataService client, error %w", err)
 	}
-	if err := client.Connect(); err != nil {
+	if err := client.Connect(ctx); err != nil {
 		return nil, fmt.Errorf("unable to connect dataService, error %w", err)
 	}
 	return &api.LcUser{
