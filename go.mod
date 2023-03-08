@@ -3,7 +3,7 @@ module github.com/vchain-us/kube-notary
 go 1.19
 
 require (
-	github.com/codenotary/vcn-enterprise v1.0.5-0.20230308114815-8ac1fc853ddc
+	github.com/codenotary/vcn-enterprise v1.0.5-0.20230308135708-00d5f60eced8
 	github.com/google/go-containerregistry v0.12.0
 	github.com/google/go-containerregistry/pkg/authn/k8schain v0.0.0-20230104193340-e797859b62b6
 	github.com/google/gops v0.3.27
@@ -150,7 +150,7 @@ require (
 	github.com/theupdateframework/go-tuf v0.5.1 // indirect
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399 // indirect
 	github.com/vbatts/tar-split v0.11.2 // indirect
-	github.com/vchain-us/ledger-compliance-go v0.9.3-0.20230308114545-0fc165579f13 // indirect
+	github.com/vchain-us/ledger-compliance-go v0.9.3-0.20230308132102-cbe6ceabec7a // indirect
 	go.mongodb.org/mongo-driver v1.10.1 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect

@@ -222,8 +222,10 @@ github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd/go.mod h1:sE
 github.com/codenotary/immudb v1.2.4/go.mod h1:+F/2NheogI25qhRdujGB3TA9coEuFXfR7WDp/EeXb2k=
 github.com/codenotary/immudb v1.3.2 h1:+BFEBGfbNEb383/kgp7cuxSxG16wdotQyWn93pEQyg8=
 github.com/codenotary/immudb v1.3.2/go.mod h1:rDId/mTSZtEF9f6SOJXNvwh1MsL/J69AAti0Q4bRok4=
-github.com/codenotary/vcn-enterprise v1.0.5-0.20230308114815-8ac1fc853ddc h1:sgVyuirsxDPWlRfsXBHeuUBcFukgQzvPQrN+2RqY3n4=
-github.com/codenotary/vcn-enterprise v1.0.5-0.20230308114815-8ac1fc853ddc/go.mod h1:RAThWa6dsoh6C1qssZilBheGESHyvjMUlnyufvgnxMQ=
+github.com/codenotary/vcn-enterprise v1.0.5-0.20230308132722-39198d192139 h1:0wiaR9GsnNRVnzCG76/Gopkkg2/YuJWD7e/nmRSZEaI=
+github.com/codenotary/vcn-enterprise v1.0.5-0.20230308132722-39198d192139/go.mod h1:oM8ueUTFkmHXy96yS0JibwECjha2lgdwdr42rjMm8Hc=
+github.com/codenotary/vcn-enterprise v1.0.5-0.20230308135708-00d5f60eced8 h1:SzGDeqjm3gK6a1Ym45dNlA2RzUIrWTpvZ3CYtuIEEPc=
+github.com/codenotary/vcn-enterprise v1.0.5-0.20230308135708-00d5f60eced8/go.mod h1:oM8ueUTFkmHXy96yS0JibwECjha2lgdwdr42rjMm8Hc=
 github.com/containerd/stargz-snapshotter/estargz v0.12.1 h1:+7nYmHJb0tEkcRaAW+MHqoKaJYZmkikupxCqVtmPuY0=
 github.com/containerd/stargz-snapshotter/estargz v0.12.1/go.mod h1:12VUuCq3qPq4y8yUW+l5w3+oXV3cx2Po3KSe/SmPGqw=
 github.com/coreos/bbolt v1.3.2/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
@@ -1090,8 +1092,8 @@ github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtX
 github.com/urfave/cli v1.22.4/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/vbatts/tar-split v0.11.2 h1:Via6XqJr0hceW4wff3QRzD5gAk/tatMw/4ZA7cTlIME=
 github.com/vbatts/tar-split v0.11.2/go.mod h1:vV3ZuO2yWSVsz+pfFzDG/upWH1JhjOiEaWq6kXyQ3VI=
-github.com/vchain-us/ledger-compliance-go v0.9.3-0.20230308114545-0fc165579f13 h1:NWvFjYJ1vVWvVpvoI4kARkVumZj2f6YXFFYolBsPKEQ=
-github.com/vchain-us/ledger-compliance-go v0.9.3-0.20230308114545-0fc165579f13/go.mod h1:+Q4IU/RrwrLAcTmA31+1vTfk5421Apow1TC5kfbab70=
+github.com/vchain-us/ledger-compliance-go v0.9.3-0.20230308132102-cbe6ceabec7a h1:hZ31Db4yjlb6H2rrNxyo93JULtK2hK/KeLxmORqfPCE=
+github.com/vchain-us/ledger-compliance-go v0.9.3-0.20230308132102-cbe6ceabec7a/go.mod h1:+Q4IU/RrwrLAcTmA31+1vTfk5421Apow1TC5kfbab70=
 github.com/vmihailenco/msgpack/v4 v4.3.12 h1:07s4sz9IReOgdikxLTKNbBdqDMLsjPKXwvCazn8G65U=
 github.com/vmihailenco/tagparser v0.1.1 h1:quXMXlA39OCbd2wAdTsGDlK9RkOk6Wuw+x37wVyIuWY=
 github.com/xanzy/ssh-agent v0.2.1/go.mod h1:mLlQY/MoOhWBj+gOGMQkOeiEvkx+8pJSI+0Bx9h2kr4=

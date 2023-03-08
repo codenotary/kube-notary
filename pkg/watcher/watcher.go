@@ -240,11 +240,11 @@ func VerifyArtifact(hash, apiKey, lcLedger, signerID, lcHost, lcPort, lcCert str
 
 	defer func() {
 		elapsed := time.Since(startTs)
-		log.Printf("VerifyArtifact trace %s Shutdown, total time %s, total goroutines %s", elapsed, runtime.NumGoroutine())
+		log.Printf("VerifyArtifact trace %s Shutdown, total time %s, total goroutines %d", id, elapsed, runtime.NumGoroutine())
 		if err := cl.Client.Disconnect(); err != nil {
 			log.Println("VerifyArtifact Trace %s Error Shutting down, got %v", id, err)
 		}
-		log.Printf("VerifyArtifact trace %s Shutdown DONE, total time %s, total goroutines %s", elapsed, runtime.NumGoroutine())
+		log.Printf("VerifyArtifact trace %s Shutdown DONE, total time %s, total goroutines %d", id, elapsed, runtime.NumGoroutine())
 	}()
 
 	hash = strings.TrimPrefix(hash, "sha256:")
